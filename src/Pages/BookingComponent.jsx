@@ -1,16 +1,25 @@
 import React, { useState, useEffect } from 'react';
+import care1 from '../assets/care.jpg';
+import care2 from '../assets/care2.png';
+import care3 from '../assets/care3.avif';
+import care4 from '../assets/care4.avif';
+
+
 
 const BookingComponent = () => {
     const [showCallOptions, setShowCallOptions] = useState(false);
     const [showBookingOptions, setShowBookingOptions] = useState(false);
     const [currentIndex, setCurrentIndex] = useState(0);
 
-    const images = [
-        'assets/care.jpg',
-        'assets/care2.png',
-        'assets/care3.avif',
-        'assets/care4.avif'
-    ];
+    // const images = [
+    //     '../assets/care.jpg',
+    //     '../assets/care2.png',
+    //     '../assets/care3.avif',
+    //     '../assets/care4.avif',
+        
+    // ];
+    const images = [care1, care2, care3, care4];
+
 
     useEffect(() => {
         const interval = setInterval(() => {

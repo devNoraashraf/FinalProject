@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
 import { addDoc, collection, onSnapshot, serverTimestamp, query, where,orderBy } from "firebase/firestore";
-import { auth, db } from "/firebase-config"; // ✅ استيراد Firebase بشكل صحيح
+import { auth, db } from "/firebase-config"; 
 
 const Chat = ({ room }) => {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
-  const messagesRef = collection(db, "messages"); // ✅ تحديد مرجع قاعدة البيانات
+  const messagesRef = collection(db, "messages"); 
 
   useEffect(() => {
-    if (!room) return; // ✅ التأكد من أن الغرفة محددة قبل الاشتراك في البيانات
+    if (!room) return; 
 
-    const queryMessages = query(messagesRef, where("room", "==", room), orderBy("createdAt")); // ✅ تحديد الاستعلام
+    const queryMessages = query(messagesRef, where("room", "==", room), orderBy("createdAt"));
 
     const unsubscribe = onSnapshot(queryMessages, (snapshot) => {
       let messagesList = [];
@@ -20,21 +20,21 @@ const Chat = ({ room }) => {
       setMessages(messagesList);
     });
 
-    return () => unsubscribe(); // ✅ إلغاء الاشتراك عند مغادرة الصفحة
-  }, [room]); // ✅ إعادة تحميل البيانات عند تغيير الغرفة
+    return () => unsubscribe(); 
+  }, [room]); 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (message.trim() === "") return; // ✅ منع إرسال رسائل فارغة
+    if (message.trim() === "") return; 
 
     await addDoc(messagesRef, {
-      text: message, // ✅ التأكد من أن البيانات متوافقة مع طريقة العرض
+      text: message,
       createdAt: serverTimestamp(),
       user: auth.currentUser?.displayName || "Anonymous",
       room: room,
     });
 
-    setMessage(""); // ✅ إعادة تعيين حقل الإدخال بعد الإرسال
+    setMessage(""); 
   };
 
   return (
@@ -58,7 +58,7 @@ const Chat = ({ room }) => {
           className="messageinput"
           placeholder="Message..."
           onChange={(e) => setMessage(e.target.value)}
-          value={message} // ✅ التأكد من استخدام القيمة الصحيحة
+          value={message} 
         />
         <button type="submit" className="sendmessage">
           Send

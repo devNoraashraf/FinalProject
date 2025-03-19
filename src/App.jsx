@@ -9,12 +9,12 @@ import Cards from "./Pages/Cards";
 import Card from "./Pages/Card";
 import ContactUs from "./Pages/ContactUs";
 import Dashboard from "./Pages/Dashboard";
-import Home from "./Pages/Home";
 import Auth from "./Components/Auth";
 import Cookies from "universal-cookie";
 import Chat from "./Components/ChatApp";
 import Profile from "./Pages/profile";
-import ChangePassword from "./Pages/ChangePassword"; // ✅ هنا المشكلة اتحلت
+import ChangePassword from "./Pages/ChangePassword"; 
+import Home from "./Pages/Home";
 
 
 const cookies = new Cookies();
@@ -32,7 +32,7 @@ function App() {
       <>
         <Navbar />
         <Routes>
-          <Route path="/" element={<Home />} />
+        <Route path="/" element={<Home />} />
           <Route path="/signIn" element={<SignIn />} />
           <Route path="/register" element={<SignUp />} />
           <Route path="/booking" element={<Booking />} />
@@ -57,22 +57,25 @@ function App() {
           <Route path="/auth" element={<Auth setIsAuth={setIsAuth} />} />
         </Routes>
         <Footer />
-        <div>
-          {room ? (
-            <Chat room={room} />
-          ) : (
-            <div className="room">
-              <label>Enter room name:</label>
-              <input ref={inputroomref} />
-              <button onClick={() => setRoom(inputroomref.current.value)}>
-                Enter Chat
-              </button>
-            </div>
-          )}
-        </div>
       </>
     );
   }
+
+  return (
+    <div>
+      {room ? (
+        <Chat room={room} />
+      ) : (
+        <div className="room">
+          <label>Enter room name:</label>
+          <input ref={inputroomref} />
+          <button onClick={() => setRoom(inputroomref.current.value)}>
+            Enter Chat
+          </button>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default App;

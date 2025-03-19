@@ -5,7 +5,7 @@ getAuth,
 createUserWithEmailAndPassword,
 signInWithEmailAndPassword,
 GoogleAuthProvider,
-signInWithPopup
+signInWithPopup ,
 }from "firebase/auth";
 import { getFirestore} from "firebase/firestore";
 // TODO: Add SDKs for Firebase products that you want to use
@@ -13,6 +13,7 @@ import { getFirestore} from "firebase/firestore";
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+
 const firebaseConfig = {
   apiKey: "AIzaSyDWIkY9UxaasYzJ0_GFs_Lf_PzKNmkbWqs",
   authDomain: "finalproject-367b7.firebaseapp.com",
@@ -31,3 +32,4 @@ export const signInWithGoogle = () => {
     return signInWithPopup(auth, provider);
   };
   export const db=getFirestore(app);
+

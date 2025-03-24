@@ -6,6 +6,8 @@ import Navbar from "./Components/Navbar";
 import Footer from "./Components/Footer";
 import Booking from "./Pages/BookingComponent";
 import Cards from "./Pages/Cards";
+import Medicines from "./Pages/Medicines";
+import Form from "./Pages/Form";
 import Card from "./Pages/Card";
 import ContactUs from "./Pages/ContactUs";
 import Dashboard from "./Pages/Dashboard";
@@ -23,9 +25,6 @@ function App() {
   const [isAuth, setIsAuth] = useState(cookies.get("auth-token"));
   const [room, setRoom] = useState(null);
   const inputroomref = useRef(null);
-   
-
-
 
   if (!isAuth) {
     return (
@@ -38,14 +37,14 @@ function App() {
           <Route path="/booking" element={<Booking />} />
           <Route path="/services" element={<Cards />} />
           <Route path="/pharmacy" element={<Card />} />
+          <Route path="/MedicineForm" element={<Form />} />
+          <Route path="/pharmacy/:departmentId" element={<Medicines />} />
           <Route path="/ContactUs" element={<ContactUs />} />
-
           <Route
             path="/dashboard"
             element={
               <Dashboard />
-            }
-          />
+          } />
 
           <Route
             path="/profile"

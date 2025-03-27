@@ -17,8 +17,10 @@ import Chat from "./Components/ChatApp";
 import Profile from "./Pages/profile";
 import ChangePassword from "./Pages/ChangePassword"; 
 import Home from "./Pages/Home";
-
-
+import DoaaDahboard from 
+"./Pages/DoaaDahboard"
+import DoctorsList from "./Pages/DoctorsList";
+import BookingPage from "./Pages/Bookingpage";
 const cookies = new Cookies();
 
 function App() {
@@ -40,11 +42,11 @@ function App() {
           <Route path="/MedicineForm" element={<Form />} />
           <Route path="/pharmacy/:departmentId" element={<Medicines />} />
           <Route path="/ContactUs" element={<ContactUs />} />
-          <Route
-            path="/dashboard"
-            element={
-              <Dashboard />
-          } />
+
+          <Route path="/DoctorList" element={<DoctorsList />} />
+          <Route path="/booking/:doctorId" element={<BookingPage  />} />
+          <Route path="/DoaaDahboard" element={<DoaaDahboard />} />
+
 
           <Route
             path="/profile"

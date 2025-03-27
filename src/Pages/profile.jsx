@@ -1,21 +1,15 @@
 import { useState, useEffect } from "react";
 import { auth } from "../../firebase-config";
-import { useNavigate, Link } from "react-router-dom";
 import Cookies from "universal-cookie";
-
+import { Link } from "react-router-dom";
+import useAuthStore from "../../store";
 const cookies = new Cookies();
 
 const Profile = () => {
-  const [user, setUser] = useState(null);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
-      setUser(currentUser);
-    });
-
-    return () => unsubscribe();
-  }, []);
+  const user = useAuthStore((state) => state.user);
+  
+ console.log(user.name);
+ console.log(user);
 
   const handleLogout = () => {
     auth.signOut().then(() => {
@@ -56,11 +50,11 @@ const Profile = () => {
             />
           ) : (
             <div className="w-32 h-32 rounded-full mx-auto border-4 border-blue-500 shadow-lg bg-blue-200 flex items-center justify-center text-4xl font-bold text-blue-700">
-              {user?.displayName ? user.displayName.charAt(0) : "م"}
+              {user?.displayName ? user.name.charAt(0) : "م"}
             </div>
           )}
 
-          <h2 className="text-2xl font-bold mt-4 text-gray-800">{user?.displayName || "مريض مجهول"}</h2>
+          <h2 className="text-2xl font-bold mt-4 text-gray-800">{user?.name || "مريض مجهول"}</h2>
           <p className="text-gray-500 text-sm">{user?.email || "لا يوجد بريد إلكتروني"}</p>
           <p className="text-gray-500 text-sm mt-1">{user?.phoneNumber || "لا يوجد رقم هاتف"}</p>
           <p className="text-gray-500 text-sm mt-1">

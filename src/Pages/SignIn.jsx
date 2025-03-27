@@ -26,6 +26,7 @@ const SignIn = () => {
         userDoc = await getDoc(doc(db, "Doctors", user.uid));
         userData = userDoc.exists() ? userDoc.data() : null;
       }
+console.log(user.uid);
 
       if (userData) {
         login({
@@ -36,7 +37,7 @@ const SignIn = () => {
           profileImage: userData.profileImage,
         });
 
-        navigate(userData.role === "doctor" ? "/dashboard" : "/profile");
+        navigate(userData.role === "doctor" ? `/DoaaDahboard` : "/profile");
       } else {
         console.error("User not found in database");
       }

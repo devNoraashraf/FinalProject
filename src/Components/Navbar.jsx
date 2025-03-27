@@ -14,11 +14,12 @@ function Navbar() {
     const handleProfileClick = () => {
         setDropdownOpen(!dropdownOpen);
     };
-
-
+//    const doctorId=user.uid;
+   
+// console.log(doctorId)
     const handleNavigation = () => {
         if (user?.role === "doctor") {
-            navigate("/dashboard");
+            navigate(`/DoaaDahboard`);
         } else {
             navigate("/profile");
         }
@@ -47,6 +48,7 @@ function Navbar() {
                                 <ul className="flex space-x-8 space-x-reverse text-lg font-semibold text-white">
                                     <li><Link to="/" className="transition-all duration-300 hover:text-[#4acbbf]">الرئيسية</Link></li>
                                     <li><Link to="/about" className="transition-all duration-300 hover:text-[#4acbbf]">من نحن</Link></li>
+                                    <li><Link to="/DoctorList" className="transition-all duration-300 hover:text-[#4acbbf]">اطبائنا </Link></li>
                                     <li className="relative group">
                                         <Link to="/services" className="flex items-center gap-1 transition-all duration-300 hover:text-[#4acbbf]">
                                             الخدمات

@@ -1,5 +1,5 @@
 import React from "react";
-import vedio from '../assets/vid.mp4'
+import vedio from '../assets/Blue White Modern Medical Healthcare Presentation.mp4'
 const VideoSection = () => {
   return (
     <div className=" w-full h-screen mt-24" dir='rtl'>

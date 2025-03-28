@@ -35,7 +35,8 @@ function Medicines() {
     return (
         <div className="px-10 mt-5 mb-5">
 
-            <div className="flex flex-col md:flex-row gap-4 mb-5 items-center">
+            <div className="flex flex-col md:flex-row justify-end gap-10 mb-5 bg-[#3ba99c] p-5 rounded-xl rtl text-right">
+
                 <input
                     type="text"
                     placeholder="ابحث عن دواء"

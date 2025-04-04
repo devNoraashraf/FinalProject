@@ -1,5 +1,5 @@
 import { useState, useRef , useEffect } from "react";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes , useLocation} from "react-router-dom";
 import SignIn from "./Pages/SignIn";
 import SignUp from "./Pages/SignUp";
 import Navbar from "./Components/Navbar";
@@ -15,6 +15,8 @@ import Chat from "./Components/ChatApp";
 import Profile from "./Pages/profile";
 import ChangePassword from "./Pages/ChangePassword"; 
 import Home from "./Pages/Home";
+import Adminpage from "./Pages/Adminpage";
+
 
 
 const cookies = new Cookies();
@@ -24,14 +26,17 @@ function App() {
   const [room, setRoom] = useState(null);
   const inputroomref = useRef(null);
    
+  const location = useLocation();
+  const noHeaderFooterPages = ["/dashboard", "/admin", "/signIn", "/register"];
+
 
 
 
   if (!isAuth) {
     return (
       <>
-        <Navbar />
-        <Routes>
+      {!noHeaderFooterPages.includes(location.pathname) && <Navbar />}
+      <Routes>
         <Route path="/" element={<Home />} />
           <Route path="/signIn" element={<SignIn />} />
           <Route path="/register" element={<SignUp />} />
@@ -39,25 +44,14 @@ function App() {
           <Route path="/services" element={<Cards />} />
           <Route path="/pharmacy" element={<Card />} />
           <Route path="/ContactUs" element={<ContactUs />} />
-
-          <Route
-            path="/dashboard"
-            element={
-              <Dashboard />
-            }
-          />
-
-          <Route
-            path="/profile"
-            element={
-              <Profile />
-            }
-          />
+          <Route path="/admin" element={<Adminpage />} />
+          <Route path="/dashboard" element={<Dashboard />}/>
+          <Route path="/profile" element={ <Profile />}/>
           <Route path="/change-password" element={<ChangePassword />} />
           <Route path="/auth" element={<Auth setIsAuth={setIsAuth} />} />
         </Routes>
-        <Footer />
-      </>
+        {!noHeaderFooterPages.includes(location.pathname) && <Footer />}
+        </>
     );
   }
 

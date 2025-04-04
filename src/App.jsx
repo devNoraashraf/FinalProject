@@ -6,6 +6,8 @@ import Navbar from "./Components/Navbar";
 import Footer from "./Components/Footer";
 import Booking from "./Pages/BookingComponent";
 import Cards from "./Pages/Cards";
+import Medicines from "./Pages/Medicines";
+import Form from "./Pages/Form";
 import Card from "./Pages/Card";
 import ContactUs from "./Pages/ContactUs";
 import Dashboard from "./Pages/Dashboard";
@@ -19,6 +21,10 @@ import Adminpage from "./Pages/Adminpage";
 
 
 
+import DoaaDahboard from 
+"./Pages/DoaaDahboard"
+import DoctorsList from "./Pages/DoctorsList";
+import BookingPage from "./Pages/Bookingpage";
 const cookies = new Cookies();
 
 function App() {
@@ -43,10 +49,24 @@ function App() {
           <Route path="/booking" element={<Booking />} />
           <Route path="/services" element={<Cards />} />
           <Route path="/pharmacy" element={<Card />} />
+          <Route path="/MedicineForm" element={<Form />} />
+          <Route path="/pharmacy/:departmentId" element={<Medicines />} />
           <Route path="/ContactUs" element={<ContactUs />} />
           <Route path="/admin" element={<Adminpage />} />
           <Route path="/dashboard" element={<Dashboard />}/>
-          <Route path="/profile" element={ <Profile />}/>
+          {/* <Route path="/profile" element={ <Profile />}/> */}
+
+          <Route path="/DoctorList" element={<DoctorsList />} />
+          <Route path="/booking/:doctorId" element={<BookingPage  />} />
+          <Route path="/DoaaDahboard" element={<DoaaDahboard />} />
+
+
+          <Route
+            path="/profile"
+            element={
+              <Profile />
+            }
+          />
           <Route path="/change-password" element={<ChangePassword />} />
           <Route path="/auth" element={<Auth setIsAuth={setIsAuth} />} />
         </Routes>

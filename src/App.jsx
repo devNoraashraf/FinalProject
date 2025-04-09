@@ -14,7 +14,7 @@ import Dashboard from "./Pages/Dashboard";
 import Auth from "./Components/Auth";
 import Cookies from "universal-cookie";
 import Chat from "./Components/ChatApp";
-import Profile from "./Pages/profile";
+import Profile from "./Pages/ProfilePage";
 import ChangePassword from "./Pages/ChangePassword"; 
 import Home from "./Pages/Home";
 import Adminpage from "./Pages/Adminpage";

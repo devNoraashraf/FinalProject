@@ -37,7 +37,7 @@ console.log(user.uid);
           profileImage: userData.profileImage,
         });
 
-        navigate(userData.role === "doctor" ? `/DoaaDahboard` : "/profile");
+        navigate(userData.role === "doctor" ? `/dashboard` : "/profile");
       } else {
         console.error("User not found in database");
       }

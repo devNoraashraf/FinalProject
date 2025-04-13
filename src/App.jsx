@@ -10,7 +10,6 @@ import Medicines from "./Pages/Medicines";
 import Form from "./Pages/Form";
 import Card from "./Pages/Card";
 import ContactUs from "./Pages/ContactUs";
-import Dashboard from "./Pages/Dashboard";
 import Auth from "./Components/Auth";
 import Cookies from "universal-cookie";
 import Chat from "./Components/ChatApp";
@@ -18,9 +17,6 @@ import Profile from "./Pages/ProfilePage";
 import ChangePassword from "./Pages/ChangePassword"; 
 import Home from "./Pages/Home";
 import Adminpage from "./Pages/Adminpage";
-
-
-
 import DoaaDahboard from 
 "./Pages/DoaaDahboard"
 import DoctorsList from "./Pages/DoctorsList";
@@ -53,12 +49,11 @@ function App() {
           <Route path="/pharmacy/:departmentId" element={<Medicines />} />
           <Route path="/ContactUs" element={<ContactUs />} />
           <Route path="/admin" element={<Adminpage />} />
-          <Route path="/dashboard" element={<Dashboard />}/>
-          {/* <Route path="/profile" element={ <Profile />}/> */}
+
 
           <Route path="/DoctorList" element={<DoctorsList />} />
           <Route path="/booking/:doctorId" element={<BookingPage  />} />
-          <Route path="/DoaaDahboard" element={<DoaaDahboard />} />
+          <Route path="/dashboard" element={<DoaaDahboard />} />
 
 
           <Route

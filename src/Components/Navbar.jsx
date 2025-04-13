@@ -1,120 +1,198 @@
-
+import { motion, AnimatePresence } from "framer-motion";
 import logo from "../assets/logo.png";
 import { Link } from "react-router-dom";
 import useAuthStore from "../../store";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+
+// تعريف الألوان
+const colors = {
+  primary: "#006272",
+  primaryLight: "#008080",
+  secondary: "#e0f7fa",
+  accent: "#ff7043",
+  textDark: "#1a365d",
+  textLight: "#f7fafc"
+};
 
 function Navbar() {
-    const navigate = useNavigate();
-    const user = useAuthStore((state) => state.user); // جلب بيانات المستخدم من Zustand
-    const logout = useAuthStore((state) => state.logout); // دالة تسجيل الخروج
-    const [dropdownOpen, setDropdownOpen] = useState(false);
+  const navigate = useNavigate();
+  const user = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
-    const handleProfileClick = () => {
-        setDropdownOpen(!dropdownOpen);
-    };
-//    const doctorId=user.uid;
-   
-// console.log(doctorId)
-    const handleNavigation = () => {
-        if (user?.role === "doctor") {
-            navigate(`/dashboard`);
-        } else {
-            navigate("/profile");
-        }
+  // إغلاق القائمة المنسدلة عند النقر خارجها
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setDropdownOpen(false);
+      }
     };
-    const handleLogout = () => {
-        logout();
-        navigate("/signIn");
-        setDropdownOpen(false);
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
     };
-    // console.log(user);
+  }, []);
 
+  const handleProfileClick = () => {
+    setDropdownOpen(!dropdownOpen);
+  };
 
-    return (
-        <>
-            <header className="bg-[#09243c] dark:border-gray-600 dark:bg-gray-900" dir="rtl">
-                <div className="container mx-auto flex justify-between items-center py-4 px-6">
-                    <Link to="/" className="flex items-center gap-3">
-                        <img src={logo} className="h-16 w-16" alt="شعار Medicross" />
-                        <span className="text-2xl font-semibold text-white">Medicross</span>
-                    </Link>
+  const handleNavigation = () => {
+    if (user?.role === "doctor") {
+      navigate(`/DoaaDahboard`);
+    } else {
+      navigate("/profile");
+    }
+    setDropdownOpen(false);
+  };
 
-                    <nav>
-                        <div className="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl p-4">
-                            <div id="mega-menu-full" className="items-center font-medium w-full md:flex md:w-auto" dir="rtl">
-                                <ul className="flex space-x-8 space-x-reverse text-lg font-semibold text-white">
-                                    <li><Link to="/" className="transition-all duration-300 hover:text-[#4acbbf]">الرئيسية</Link></li>
-                                    <li><Link to="/about" className="transition-all duration-300 hover:text-[#4acbbf]">من نحن</Link></li>
-                                    <li><Link to="/DoctorList" className="transition-all duration-300 hover:text-[#4acbbf]">اطبائنا </Link></li>
-                                    <li className="relative group">
-                                        <Link to="/services" className="flex items-center gap-1 transition-all duration-300 hover:text-[#4acbbf]">
-                                            الخدمات
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 transition-transform duration-300 group-hover:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                                            </svg>
-                                        </Link>
-                                        <ul className="absolute left-0 hidden w-56 mt-2 space-y-2 bg-[#4acbbf] text-white rounded-lg shadow-lg group-hover:block hover:block pointer-events-auto z-50">
-                                            <li><Link to="/booking" className="block px-4 py-2 transition-all duration-300 hover:bg-[#3ba99c]">حجز المواعيد</Link></li>
-                                            <li><Link to="/auth" className="block px-4 py-2 transition-all duration-300 hover:bg-[#3ba99c]">استشارة طبية</Link></li>
-                                            <li><Link to="/pharmacy" className="block px-4 py-2 transition-all duration-300 hover:bg-[#3ba99c]">توصيل الأدوية</Link></li>
-                                        </ul>
-                                    </li>
-                                    <li><Link to="/contactUs" className="transition-all duration-300 hover:text-[#4acbbf]">اتصل بنا</Link></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </nav>
+  const handleLogout = () => {
+    logout();
+    navigate("/signIn");
+    setDropdownOpen(false);
+  };
 
-                    <div className="flex items-center gap-6">
-                        {!user ? (
-                            <Link to="/signIn" className="px-5 py-2 text-white border-2 border-[#4acbbf] rounded-lg transition-all duration-300 hover:border-[#3ba97f] hover:text-[#3ba97f] shadow-md">تسجيل الدخول</Link>
-                        ) : (
-                            <>
+  // أنيميشن للعناصر
+  const navItemVariants = {
+    hidden: { opacity: 0, y: -20 },
+    visible: (i) => ({
+      opacity: 1,
+      y: 0,
+      transition: {
+        delay: i * 0.1,
+        duration: 0.5
+      }
+    }),
+    hover: {
+      scale: 1.05,
+      color: colors.accent,
+      transition: { duration: 0.2 }
+    }
+  };
 
-                                <img
-                                    src={user.profileImage}
-                                    alt="User"
-                                    onClick={handleProfileClick}
-                                    className="w-10 h-10 rounded-full cursor-pointer"
-                                />
-                                <span onClick={handleProfileClick} className="cursor-pointer font-bold text-white">
-                                    {user.name}
-                                </span>
+  return (
+    <motion.header 
+      className="bg-primary text-white shadow-md sticky top-0 z-50"
+      dir="rtl"
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
+    >
+      <div className="container mx-auto flex justify-between items-center py-4 px-6">
+        <Link to="/" className="flex items-center gap-3">
+          <motion.img 
+            src={logo} 
+            className="h-16 w-16" 
+            alt="شعار Medicross"
+            whileHover={{ rotate: [0, -10, 10, -5, 5, 0] }}
+            transition={{ duration: 0.5 }}
+          />
+          <motion.span 
+            className="text-2xl font-semibold"
+            whileHover={{ color: colors.accent }}
+          >
+            Medicross
+          </motion.span>
+        </Link>
 
-                                {/* القائمة المنسدلة */}
-                                {dropdownOpen && (
-                                    <div className="absolute top-14 left-1/20 translate-x-[25%] bg-white shadow-lg rounded-lg w-40 py-2 border border-gray-200">
-                                        <button
-                                            onClick={handleNavigation}
-                                            className="block w-full text-right px-4 py-2 hover:bg-gray-100"
-                                        >
-                                            حسابي
-                                        </button>
-                                        <button
-                                            onClick={handleLogout}
-                                            className="block w-full text-right px-4 py-2 text-red-500 hover:bg-gray-100"
-                                        >
-                                            تسجيل الخروج
-                                        </button>
-                                    </div>
-                                )}
-                            </>
-                        )}
-                        <Link
-                            to="/booking"
-                            className="px-5 py-2 text-white border-2 border-[#4acbbf] rounded-lg transition-all duration-300 hover:border-[#3ba97f] hover:text-[#3ba97f] shadow-md"
-                        >
-                            احجز الآن
-                        </Link>
-                    </div>
+        <nav>
+          <ul className="flex space-x-8 space-x-reverse text-lg font-semibold">
+            {[
+              { path: "/", label: "الرئيسية" },
+              { path: "/about", label: "من نحن" },
+              // { path: "/DoctorList", label: "أطباؤنا" },
+              { path: "/services", label: "الخدمات" },
+              { path: "/contactUs", label: "اتصل بنا" }
+            ].map((item, i) => (
+              <motion.li
+                key={item.path}
+                custom={i}
+                initial="hidden"
+                animate="visible"
+                whileHover="hover"
+                variants={navItemVariants}
+              >
+                <Link to={item.path} className="block py-2 px-1">
+                  {item.label}
+                </Link>
+              </motion.li>
+            ))}
+          </ul>
+        </nav>
 
-                </div>
-            </header>
-        </>
-    );
+        <div className="flex items-center gap-6 relative" ref={dropdownRef}>
+          {!user ? (
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              <Link 
+                to="/signIn" 
+                className="px-5 py-2 border-2 border-accent rounded-lg hover:border-secondary hover:text-secondary transition-colors duration-300"
+              >
+                تسجيل الدخول
+              </Link>
+            </motion.div>
+          ) : (
+            <>
+              <motion.div
+                className="flex items-center gap-2 cursor-pointer"
+                onClick={handleProfileClick}
+                whileHover={{ scale: 1.05 }}
+              >
+                <motion.img
+                  src={user.profileImage || "https://via.placeholder.com/40"}
+                  alt="User"
+                  className="w-10 h-10 rounded-full border-2 border-white"
+                  whileHover={{ borderColor: colors.accent }}
+                  transition={{ duration: 0.2 }}
+                />
+                <motion.span 
+                  className="font-bold"
+                  whileHover={{ color: colors.accent }}
+                >
+                  {user.name}
+                </motion.span>
+              </motion.div>
+
+              <AnimatePresence>
+                {dropdownOpen && (
+                  <motion.div
+                    className="absolute top-14 left-0 bg-white shadow-lg rounded-lg w-48 py-2 z-50"
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <motion.button
+                      onClick={handleNavigation}
+                      className="block w-full text-right px-4 py-2 hover:bg-gray-100 text-gray-800"
+                      whileHover={{ backgroundColor: "#f0f0f0", paddingRight: "1.5rem" }}
+                      transition={{ duration: 0.1 }}
+                    >
+                      حسابي
+                    </motion.button>
+                    <motion.button
+                      onClick={handleLogout}
+                      className="block w-full text-right px-4 py-2 text-red-500 hover:bg-gray-100"
+                      whileHover={{ backgroundColor: "#f0f0f0", paddingRight: "1.5rem" }}
+                      transition={{ duration: 0.1 }}
+                    >
+                      تسجيل الخروج
+                    </motion.button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </>
+          )}
+        </div>
+      </div>
+    </motion.header>
+  );
 }
 
 export default Navbar;

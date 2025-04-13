@@ -1,168 +1,39 @@
-// import React from 'react'
-// import { useForm } from "react-hook-form";
-// import { useNavigate } from "react-router-dom";
-// import { useState } from 'react';
-// import img from '../assets/s.jpg'
 
-
-// const SignUp = () => {
-//   const [isDoctor, setIsDoctor] = useState(false);
-//   const [formData, setFormData] = useState({
-//     name: "",
-//     email: "",
-//     password: "",
-//     specialization: "",
-//   });
-//   const navigate = useNavigate();
-
-//   const handleChange = (e) => {
-//     setFormData({ ...formData, [e.target.name]: e.target.value });
-//   };
-
-//   const handleSubmit = (e) => {
-//     e.preventDefault();
-//     // Simulate successful registration
-//     alert("تم التسجيل بنجاح!");
-//     navigate("/signIn");
-//   };
-
-//   return (
-// <div className="flex justify-center items-center h-screen bg-cover bg-center" style={{ backgroundImage: `url(${img})` }}>
-// <div className="w-full max-w-md bg-white bg-opacity-70 p-6 rounded-lg shadow-md">
-//         <div className="flex mb-4 border-b">
-//           <button
-//             className={`flex-1 p-2 ${!isDoctor ? "border-b-2 border-blue-500" : ""}`}
-//             onClick={() => setIsDoctor(false)}
-//           >
-//             تسجيل كمستخدم
-//           </button>
-//           <button
-//             className={`flex-1 p-2 ${isDoctor ? "border-b-2 border-blue-500" : ""}`}
-//             onClick={() => setIsDoctor(true)}
-//           >
-//             تسجيل كطبيب
-//           </button>
-//         </div>
-//         <form onSubmit={handleSubmit} className="space-y-4">
-//           <input
-//             type="text"
-//             name="name"
-//             placeholder="الاسم الكامل"
-//             value={formData.name}
-//             onChange={handleChange}
-//             className="w-full p-2 border rounded"
-//             required
-//           />
-//           <input
-//             type="email"
-//             name="email"
-//             placeholder="البريد الإلكتروني"
-//             value={formData.email}
-//             onChange={handleChange}
-//             className="w-full p-2 border rounded"
-//             required
-//           />
-//           <input
-//             type="password"
-//             name="password"
-//             placeholder="كلمة المرور"
-//             value={formData.password}
-//             onChange={handleChange}
-//             className="w-full p-2 border rounded"
-//             required
-//           />
-//           {isDoctor && (
-//             <input
-//               type="text"
-//               name="specialization"
-//               placeholder="التخصص"
-//               value={formData.specialization}
-//               onChange={handleChange}
-//               className="w-full p-2 border rounded"
-//               required
-//             />
-//           )}
-//           <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded">
-//             تسجيل
-//           </button>
-//         </form>
-//         <p className="text-center mt-4">
-//        لديك حساب؟ <button className="text-blue-500 underline" onClick={() => navigate("/signIn")}>تسجيل الدخول</button>
-//      </p>
-//       </div>
-//     </div>
-//   );
-//   };
-
-// export default SignUp
 
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth, db } from "../../firebase-config";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
+import { motion } from "framer-motion";
 import img from "../assets/s.jpg";
 import userAvatar from "../assets/avatar.png";
 import doctorAvatar from "../assets/doctor-avatar.png";
 
-// const SignUp = () => {
-//   const [isDoctor, setIsDoctor] = useState(false);
-//   const [formData, setFormData] = useState({
-//     name: "",
-//     email: "",
-//     password: "",
-//     specialization: "",
-//   });
-
-//   const navigate = useNavigate();
-
-//   const handleChange = (e) => {
-//     setFormData({ ...formData, [e.target.name]: e.target.value });
-//   };
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-
-//     try {
-//       // تسجيل المستخدم في Firebase Auth
-//       const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
-//       const user = userCredential.user;
-
-//       // تحديد المجموعة المناسبة (Collection)
-//       const collectionName = isDoctor ? "Doctors" : "users";
-
-//               // تعيين صورة افتراضية بناءً على الدور
-//               const defaultAvatar = isDoctor ? "/assets/doctor-avatar.png" : "/assets/avatar.png";
-
-//               // تحديث البروفايل في Firebase Auth
-//               // await updateProfile(user, {
-//               //     photoURL: defaultAvatar
-//               // });
-
-//       // حفظ بيانات المستخدم في Firestore
-//       await setDoc(doc(db, collectionName, user.uid), {
-//         name: formData.name,
-//         email: formData.email,
-//         photoURL: defaultAvatar, 
-//         role: isDoctor ? "doctor" : "user",
-//         specialization: isDoctor ? formData.specialization : null,
-//       });
-
-//       alert("تم التسجيل بنجاح!");
-//       // navigate(isDoctor ? "/dashboard" : "/profile"); // إعادة التوجيه حسب الدور
-//       navigate("/signIn")
-//     } catch (error) {
-//       console.error("خطأ أثناء التسجيل:", error.message);
-//       alert(error.message);
-//     }
-//   };
+// قائمة تخصصات موحدة لجميع المكونات
+const UNIFIED_SPECIALTIES = [
+  "قلب",
+  "مسالك بولية",
+  "أطفال",
+  "جلدية",
+  "عظام",
+  "أسنان",
+  "عيون",
+  "مخ وأعصاب",
+  "باطنة",
+  "التخدير",
+  "جراحة عامة",
+  "نساء وتوليد"
+];
 
 const SignUp = () => {
-  const [tab, setTab] = useState("user"); // لتحديد التاب الحالي
+  const [tab, setTab] = useState("user");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
-  const [specialty, setSpecialty] = useState(""); // التخصص للأطباء
+  const [specialty, setSpecialty] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const defaultImages = {
@@ -172,55 +43,222 @@ const SignUp = () => {
 
   const handleSignup = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+    setError("");
+    
     try {
+      if (password.length < 6) {
+        throw new Error("كلمة المرور يجب أن تكون 6 أحرف على الأقل");
+      }
+
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
       const userData = {
-        name,
-        email,
+        name: name.trim(),
+        email: email.trim(),
         role: tab,
         profileImage: defaultImages[tab],
+        createdAt: new Date().toISOString()
       };
 
       if (tab === "doctor") {
-        userData.specialty = specialty;
+        if (!specialty) {
+          throw new Error("يجب تحديد التخصص");
+        }
+        
+        // التحقق من أن التخصص موجود في القائمة الموحدة
+        const normalizedSpecialty = UNIFIED_SPECIALTIES.find(s => 
+          s === specialty.trim()
+        );
+        
+        if (!normalizedSpecialty) {
+          throw new Error("التخصص المحدد غير صحيح");
+        }
+
+        userData.specialty = normalizedSpecialty;
+        
+        console.log("Registering doctor with data:", userData);
         await setDoc(doc(db, "Doctors", user.uid), userData);
       } else {
         await setDoc(doc(db, "users", user.uid), userData);
       }
 
-      navigate("/signIn");
+      navigate("/signIn", { state: { registrationSuccess: true } });
     } catch (error) {
       console.error("Error signing up:", error.message);
+      setError(getFriendlyError(error.message));
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  const getFriendlyError = (error) => {
+    switch (error) {
+      case "Firebase: Error (auth/email-already-in-use).":
+        return "البريد الإلكتروني مسجل بالفعل";
+      case "Firebase: Error (auth/invalid-email).":
+        return "بريد إلكتروني غير صالح";
+      case "Firebase: Error (auth/weak-password).":
+        return "كلمة المرور ضعيفة (يجب أن تكون 6 أحرف على الأقل)";
+      case "كلمة المرور يجب أن تكون 6 أحرف على الأقل":
+        return error;
+      case "يجب تحديد التخصص":
+        return error;
+      case "التخصص المحدد غير صحيح":
+        return error;
+      default:
+        return "حدث خطأ أثناء التسجيل";
+    }
+  };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-cover bg-center" style={{ backgroundImage: `url(${img})` }}>
-      <div className="w-full max-w-md bg-white bg-opacity-70 p-6 rounded-lg shadow-md">
-        <div className="flex mb-4 border-b">
-          <button className={`flex-1 p-2  "border-b-2 border-blue-500" : ""}`} onClick={() => setTab("user")}>
-            تسجيل كمستخدم
-          </button>
-          <button className={`flex-1 p-2  "border-b-2 border-blue-500" : ""}`} onClick={() => setTab("doctor")}>
-            تسجيل كطبيب
-          </button>
+    <div 
+      className="flex justify-center items-center min-h-screen bg-cover bg-center bg-no-repeat"
+      style={{ 
+        backgroundImage: `url(${img})`,
+        direction: 'rtl'
+      }}
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-md mx-4"
+      >
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+          {/* Header */}
+          <div className="bg-gradient-to-l from-[#006272] to-[#008080] p-6 text-center">
+            <h2 className="text-2xl font-bold text-white">إنشاء حساب جديد</h2>
+            <p className="text-white/90 mt-1">انضم إلى مجتمع Medicross</p>
+          </div>
+
+          {/* Tabs */}
+          <div className="flex border-b border-gray-200">
+            <button
+              className={`flex-1 py-3 font-medium text-sm transition-colors ${
+                tab === "user" 
+                  ? "text-[#006272] border-b-2 border-[#006272]"
+                  : "text-gray-500 hover:text-gray-700"
+              }`}
+              onClick={() => setTab("user")}
+            >
+              مستخدم عادي
+            </button>
+            <button
+              className={`flex-1 py-3 font-medium text-sm transition-colors ${
+                tab === "doctor"
+                  ? "text-[#006272] border-b-2 border-[#006272]"
+                  : "text-gray-500 hover:text-gray-700"
+              }`}
+              onClick={() => setTab("doctor")}
+            >
+              طبيب
+            </button>
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleSignup} className="p-6 space-y-5">
+            {error && (
+              <motion.div 
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-red-50 text-red-600 p-3 rounded-lg text-sm border border-red-100"
+              >
+                {error}
+              </motion.div>
+            )}
+
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">الاسم الكامل</label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#008080] focus:border-transparent transition duration-300"
+                placeholder="أدخل اسمك الكامل"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">البريد الإلكتروني</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#008080] focus:border-transparent transition duration-300"
+                placeholder="example@domain.com"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">كلمة المرور</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#008080] focus:border-transparent transition duration-300"
+                placeholder="••••••••"
+                minLength="6"
+                required
+              />
+              <p className="text-xs text-gray-500 mt-1">يجب أن تكون كلمة المرور 6 أحرف على الأقل</p>
+            </div>
+
+            {tab === "doctor" && (
+              <div>
+                <label className="block text-gray-700 font-medium mb-2">التخصص</label>
+                <select
+                  value={specialty}
+                  onChange={(e) => setSpecialty(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#008080] focus:border-transparent transition duration-300"
+                  required
+                >
+                  <option value="">اختر التخصص</option>
+                  {UNIFIED_SPECIALTIES.map((spec) => (
+                    <option key={spec} value={spec}>{spec}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            <motion.button
+              type="submit"
+              disabled={isLoading}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className={`w-full py-3 px-6 rounded-lg text-white font-medium text-lg transition duration-300 ${
+                isLoading ? 'bg-[#008080]/90' : 'bg-gradient-to-l from-[#008080] to-[#006272] hover:from-[#006272] hover:to-[#004d5a]'
+              } shadow-md`}
+            >
+              {isLoading ? (
+                <span className="flex items-center justify-center">
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  جاري إنشاء الحساب...
+                </span>
+              ) : 'إنشاء حساب'}
+            </motion.button>
+          </form>
+
+          {/* Footer */}
+          <div className="bg-gray-50 p-6 border-t border-gray-200 text-center">
+            <p className="text-gray-600">
+              لديك حساب بالفعل؟{' '}
+              <button 
+                className="text-[#006272] font-medium hover:text-[#008080] hover:underline"
+                onClick={() => navigate("/signIn")}
+              >
+                تسجيل الدخول
+              </button>
+            </p>
+          </div>
         </div>
-        <form onSubmit={handleSignup} className="space-y-4">
-          <input type="text" name="name" placeholder="الاسم الكامل" value={name} onChange={(e) => setName(e.target.value)} className="w-full p-2 border rounded" required />
-          <input type="email" name="email" placeholder="البريد الإلكتروني" value={email} onChange={(e) => setEmail(e.target.value)}  className="w-full p-2 border rounded" required />
-          <input type="password" name="password" placeholder="كلمة المرور" value={password} onChange={(e) => setPassword(e.target.value)}className="w-full p-2 border rounded" required />
-          {tab === "doctor" && (
-              <input type="text" name="specialization" placeholder="التخصص" value={specialty} onChange={(e) => setSpecialty(e.target.value)} className="w-full p-2 border rounded" required />
-          )}
-          <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded">تسجيل</button>
-        </form>
-        <p className="text-center mt-4">
-          لديك حساب؟ <button className="text-blue-500 underline" onClick={() => navigate("/signIn")}>تسجيل الدخول</button>
-        </p>
-      </div>
+      </motion.div>
     </div>
   );
 };

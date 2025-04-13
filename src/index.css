@@ -1,10 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-.custom-overlay,
-.custom-modal {
-  z-index: 9999 !important;
-}
+
+/* إزالة أي تخصيصات CSS إضافية */
 
 
 

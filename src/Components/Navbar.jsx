@@ -42,7 +42,7 @@ function Navbar() {
 
   const handleNavigation = () => {
     if (user?.role === "doctor") {
-      navigate(`/DoaaDahboard`);
+      navigate(`/ddashboard`);
     } else {
       navigate("/profile");
     }

@@ -28,13 +28,23 @@ const DoctorsListPage = () => {
             const existingChat = await getDoc(chatRef);
 
             if (!existingChat.exists()) {
-                await setDoc(chatRef, {
+                await setDoc(doc(db, "Chats", chatId), {
                     participants: [patientId, doctorId],
                     lastMessage: "",
                     lastTimestamp: new Date(),
-                    doctorName: doctor.name,
-                    patientName: currentUser.displayName || "مريض",
-                });
+                    doctorInfo: {
+                      id: doctorId,
+                      name: doctor.name,
+                      specialty: doctor.specialty,
+                      profileImage: doctor.image || null
+                    },
+                    patientInfo: {
+                      id: patientId,
+                      name: currentUser.displayName || currentUser.email || "مريض",
+                      profileImage: currentUser.photoURL || null
+                    }
+                  });
+                  
             }
 
             navigate(`/chat/${chatId}`, {

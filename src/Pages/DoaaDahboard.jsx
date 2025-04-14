@@ -118,7 +118,7 @@ const ChatsPage = ({ doctorName }) => {
   }, []);
 
   const filteredChats = chats.filter((chat) =>
-    chat.patientName?.toLowerCase().includes(searchTerm.toLowerCase())
+    chat.patientInfo?.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (loading) return <div className="flex justify-center mt-10">جاري تحميل المحادثات...</div>;
@@ -167,7 +167,7 @@ const ChatsPage = ({ doctorName }) => {
                     )}
                   </div>
                   <div>
-                    <p className="font-medium text-gray-800">{chat.patientName || "مريض"}</p>
+                  <p className="font-medium text-gray-800">{chat.patientInfo?.name || "مريض"}</p>
                     <p className="text-sm text-gray-500">
                       {chat.lastMessage?.substring(0, 30) || "لا توجد رسائل بعد..."}
                     </p>

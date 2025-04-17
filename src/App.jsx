@@ -23,6 +23,7 @@ import ChatPage from "./Pages/ChatPage";
 import BookingPage from "./Pages/Bookingpage";
 import DoctorsListPage from './Pages/DoctorsListPage';
 import DoaaDahboard from "./Pages/DoaaDahboard";
+import DoctorsList from './Pages/DoctorsList';
 
 const cookies = new Cookies();
 function App() {
@@ -48,7 +49,7 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/ddashboard" element={<DoaaDahboard />} />
         <Route path="/profile" element={<Profile />} />
-        {/* <Route path="/DoctorList" element={<DoctorsList />} /> */}
+        <Route path="/DoctorsList" element={<DoctorsList />} />
         <Route path="/booking/:doctorId" element={<BookingPage />} />
         <Route path="/doctors" element={<DoctorsListPage />} />
         <Route path="/chat/:chatId" element={<ChatPage />} />

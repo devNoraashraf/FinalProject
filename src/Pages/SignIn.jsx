@@ -6,6 +6,9 @@ import { motion } from "framer-motion";
 import { auth, db } from "../../firebase-config";
 import useAuthStore from "../../store";
 import img from "../assets/s.jpg";
+import Cookies from "universal-cookie"; // تم إضافته
+
+const cookies = new Cookies(); // تهيئة الكوكيز
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
@@ -41,6 +44,10 @@ const SignIn = () => {
           profileImage: userData.profileImage,
         });
 
+        // حفظ نوع المستخدم في الكوكيز
+        cookies.set("userType", userData.role, { path: "/" });
+
+        // التوجيه حسب الدور
         navigate(userData.role === "doctor" ? `/ddashboard` : "/profile");
       } else {
         setError("المستخدم غير موجود ");
@@ -124,7 +131,7 @@ const SignIn = () => {
               <button 
                 type="button"
                 className="text-xs text-[#006272] hover:text-[#008080] mt-1 float-left"
-                onClick={() => navigate("/password-recovery")} // Updated navigation path
+                onClick={() => navigate("/password-recovery")}
               >
                 نسيت كلمة المرور؟
               </button>

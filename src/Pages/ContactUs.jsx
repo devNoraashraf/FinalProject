@@ -40,12 +40,10 @@ const ContactSection = () => {
     <section className="relative py-24 overflow-hidden" dir="rtl">
       {/* الخلفية الفاخرة */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-[#006270] opacity-95"></div>
         <div 
-          className="absolute inset-0 bg-[url('/src/assets/nora1.jpg')] bg-cover bg-center"
-          style={{ opacity: 0.15 }}
+          className="absolute inset-0 bg-[url('/src/assets/photo2.avif')] bg-cover bg-center"
+          style={{ opacity: 1 }}
         ></div>
-        <div className="absolute bottom-0 left-0 right-0 top-0 bg-[radial-gradient(circle_at_center,_#008080_0,_rgba(0,98,114,0)_70%)] opacity-20"></div>
       </div>
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">

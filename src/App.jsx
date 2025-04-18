@@ -14,7 +14,6 @@ import Dashboard from "./Pages/Dashboard";
 import PasswordRecovery from "./Pages/PasswordRecovery";
 import About from "./Pages/About";
 import Cookies from "universal-cookie";
-// import Profile from "./Pages/profile";
 import Profile from "./Pages/ProfilePage";
 import ChangePassword from "./Pages/ChangePassword";
 import Home from "./Pages/Home";
@@ -26,15 +25,21 @@ import DoaaDahboard from "./Pages/DoaaDahboard";
 import DoctorsList from './Pages/DoctorsList';
 
 const cookies = new Cookies();
+
 function App() {
   const [isAuth, setIsAuth] = useState(cookies.get("auth-token"));
   const [room, setRoom] = useState(null);
   const inputroomref = useRef(null);
   const location = useLocation();
-  const noHeaderFooterPages = ["/dashboard", "/admin", "/signIn", "/register"];
+  const userType = cookies.get("userType");
+
+  const hideHeaderFooter =
+    ["/dashboard", "/ddashboard", "/admin", "/signIn", "/register"].includes(location.pathname) ||
+    (userType === "doctor" && location.pathname.startsWith("/d"));
+
   return (
     <>
-      {!noHeaderFooterPages.includes(location.pathname) && <Navbar />}
+      {!hideHeaderFooter && <Navbar />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/signIn" element={<SignIn />} />
@@ -55,17 +60,11 @@ function App() {
         <Route path="/chat/:chatId" element={<ChatPage />} />
         <Route path="/password-recovery" element={<PasswordRecovery />} />
         <Route path="/about" element={<About />} />
-
-
         <Route path="/change-password" element={<ChangePassword />} />
-
       </Routes>
-      {!noHeaderFooterPages.includes(location.pathname) && <Footer />}
+      {!hideHeaderFooter && <Footer />}
     </>
   );
 }
-
-
-
 
 export default App;

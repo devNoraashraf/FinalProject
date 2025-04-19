@@ -7,6 +7,8 @@ import Footer from "./Components/Footer";
 import Booking from "./Pages/BookingComponent";
 import Cards from "./Pages/Cards";
 import Medicines from "./Pages/Medicines";
+import Cart from "./Pages/Cart";
+import Checkout from "./Pages/Checkout";
 import Form from "./Pages/Form";
 import Card from "./Pages/Card";
 import ContactUs from "./Pages/ContactUs";
@@ -49,6 +51,8 @@ function App() {
         <Route path="/pharmacy" element={<Card />} />
         <Route path="/MedicineForm" element={<Form />} />
         <Route path="/pharmacy/:departmentId" element={<Medicines />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/Checkout" element={<Checkout />} />
         <Route path="/ContactUs" element={<ContactUs />} />
         <Route path="/admin" element={<Adminpage />} />
         <Route path="/dashboard" element={<Dashboard />} />

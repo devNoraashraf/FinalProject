@@ -34,11 +34,11 @@ function Card() {
             <h2 className="text-2xl font-semibold text-right mb-6 pr-32">ابحث بالقسم</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 justify-center px-10">
                 {categories.map((category, index) => (
-                    <div key={index} className="bg-white rounded-lg shadow-md p-4 flex flex-col items-center transition-transform transform hover:scale-105 hover:text-blue-900 cursor-pointer group overflow-hidden"
+                    <div key={index} className="bg-white rounded-lg shadow-md p-4 flex flex-col items-center transition-transform transform hover:scale-105 hover:text-[#008080] cursor-pointer group overflow-hidden"
                         onClick={() => navigate(`/pharmacy/${category.id}`, { state: { title: category.title } })}
                         aria-label={`انتقل إلى قسم ${category.title}`} >
                         <img src={category.img} alt={category.title || "صورة القسم"} className="w-48 h-48 object-cover rounded-lg transition-opacity duration-300 hover:opacity-80" />
-                        <p className="text-[#09243c] mt-4 text-lg font-medium">{category.title}</p>
+                        <p className="text-[#006272] mt-4 text-lg font-bold">{category.title}</p>
                     </div>
                 ))}
             </div>

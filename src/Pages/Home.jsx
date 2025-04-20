@@ -256,121 +256,87 @@ function Home() {
         </motion.div>
       </section>
 
-      {/* Services Section مع تصميم محسن */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-4">
-          <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
-            <h2 className="text-3xl md:text-4xl font-bold text-[#006272] mb-4">
-              خدماتنا الطبية المتكاملة
-            </h2>
-            <div className="w-24 h-1 bg-[#006272] mx-auto mb-6"></div>
-            <p className="text-gray-600 max-w-2xl mx-auto text-lg">
-              نقدم حزمة متكاملة من الخدمات الطبية بأعلى معايير الجودة
-            </p>
-          </motion.div>
+      {/* Services Section - تصميم محسن وأنيق مع محاذاة يمين للنص */}
+<section className="py-20 bg-[#f8fafa]">
+  <div className="container mx-auto px-4">
+    <motion.div
+      className="text-center mb-16"
+      initial={{ opacity: 0, y: 50 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.8 }}
+    >
+      <h2 className="text-4xl font-bold text-[#006272] mb-4">
+        خدماتنا الطبية المتكاملة
+      </h2>
+      <div className="w-24 h-1 bg-[#006272] mx-auto mb-6 rounded-full"></div>
+      <p className="text-gray-600 max-w-2xl mx-auto text-lg">
+        نقدم حزمة متكاملة من الخدمات الطبية بأعلى معايير الجودة
+      </p>
+    </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* خدمة التشخيص */}
-            <motion.div
-              className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100"
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              whileHover={{ y: -10 }}
-            >
-              <div className="h-48 bg-gradient-to-r from-blue-50 to-cyan-50 flex items-center justify-center">
-                <div className="text-6xl">🩺</div>
-              </div>
-              <div className="p-6 text-right">
-                <h3 className="text-xl font-bold text-[#006272] mb-3">تشخيص الأمراض</h3>
-                <ul className="space-y-2 text-gray-600">
-                  <li className="flex items-start">
-                    <span className="text-[#006272] mr-2">•</span>
-                    تشخيص دقيق بالذكاء الاصطناعي
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-[#006272] mr-2">•</span>
-                    دليلك للذهاب إلى الطبيب
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-[#006272] mr-2">•</span>
-                    اختيارك للطبيب المناسب
-                  </li>
-                </ul>
-              </div>
-            </motion.div>
-
-            {/* خدمة حجز الأطباء */}
-            <motion.div
-              className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100"
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              whileHover={{ y: -10 }}
-            >
-              <div className="h-48 bg-gradient-to-r from-blue-50 to-cyan-50 flex items-center justify-center">
-                <div className="text-6xl">👨‍⚕️</div>
-              </div>
-              <div className="p-6 text-right">
-                <h3 className="text-xl font-bold text-[#006272] mb-3">حجز الأطباء</h3>
-                <ul className="space-y-2 text-gray-600">
-                  <li className="flex items-start">
-                    <span className="text-[#006272] mr-2">•</span>
-                    أكبر شبكة أطباء متخصصين
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-[#006272] mr-2">•</span>
-                    حجز موعد في دقائق
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-[#006272] mr-2">•</span>
-                    استشارة الدكتور فورا
-                  </li>
-                </ul>
-              </div>
-            </motion.div>
-
-            {/* خدمة الصيدلية */}
-            <motion.div
-              className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100"
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              whileHover={{ y: -10 }}
-            >
-              <div className="h-48 bg-gradient-to-r from-blue-50 to-cyan-50 flex items-center justify-center">
-                <div className="text-6xl">💊</div>
-              </div>
-              <div className="p-6 text-right">
-                <h3 className="text-xl font-bold text-[#006272] mb-3">خدمة الصيدلية</h3>
-                <ul className="space-y-2 text-gray-600">
-                  <li className="flex items-start">
-                    <span className="text-[#006272] mr-2">•</span>
-                    طلب أدوية أونلاين
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-[#006272] mr-2">•</span>
-                    توصيل سريع للمنزل
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-[#006272] mr-2">•</span>
-                    جميع الأدوية لدينا
-                  </li>
-                </ul>
-              </div>
-            </motion.div>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+      {[
+        {
+          icon: "🩺",
+          title: "تشخيص الأمراض",
+          points: [
+            "تشخيص دقيق بالذكاء الاصطناعي",
+            "دليلك للذهاب إلى الطبيب",
+            "اختيارك للطبيب المناسب"
+          ]
+        },
+        {
+          icon: "👨‍⚕️",
+          title: "حجز الأطباء",
+          points: [
+            "أكبر شبكة أطباء متخصصين",
+            "حجز موعد في دقائق",
+            "استشارة الدكتور فورا"
+          ]
+        },
+        {
+          icon: "💊",
+          title: "خدمة الصيدلية",
+          points: [
+            "طلب أدوية أونلاين",
+            "توصيل سريع للمنزل",
+            "جميع الأدوية لدينا"
+          ]
+        }
+      ].map((service, idx) => (
+        <motion.div
+          key={idx}
+          className="bg-white rounded-2xl p-6 shadow-md hover:shadow-lg transition-all duration-300 border-t-4 border-[#006272]"
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: idx * 0.2 }}
+          whileHover={{ y: -10 }}
+        >
+          <div className="flex items-center justify-center mb-6">
+            <div className="w-20 h-20 rounded-full bg-[#e0f7fa] flex items-center justify-center text-4xl">
+              {service.icon}
+            </div>
           </div>
-        </div>
-      </section>
+          <h3 className="text-xl font-bold text-[#006272] mb-4 text-center">
+            {service.title}
+          </h3>
+          <ul className="space-y-3 text-gray-700 text-right pr-4" dir="rtl">
+  {service.points.map((point, i) => (
+    <li key={i} className="flex items-start">
+      <span className="text-[#006272] ml-2">•</span>
+      {point}
+    </li>
+  ))}
+</ul>
+
+        </motion.div>
+      ))}
+    </div>
+  </div>
+</section>
+
 
       {/* Doctors Section المعدل لجلب البيانات من Firebase */}
       {/* Doctors Section المعدل لجلب البيانات من Firebase */}

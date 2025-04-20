@@ -22,7 +22,7 @@ import { RiStethoscopeLine } from "react-icons/ri";
 
 const cookies = new Cookies();
 
-const Profile = () => {
+const AProfile = () => {
   const user = useAuthStore((state) => state.user);
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("profile");
@@ -542,4 +542,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default AProfile;

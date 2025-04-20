@@ -10,11 +10,9 @@ import Medicines from "./Pages/Medicines";
 import Form from "./Pages/Form";
 import Card from "./Pages/Card";
 import ContactUs from "./Pages/ContactUs";
-import Dashboard from "./Pages/Dashboard";
 import PasswordRecovery from "./Pages/PasswordRecovery";
 import About from "./Pages/About";
 import Cookies from "universal-cookie";
-// import Profile from "./Pages/profile";
 import Profile from "./Pages/ProfilePage";
 import ChangePassword from "./Pages/ChangePassword";
 import Home from "./Pages/Home";
@@ -23,6 +21,7 @@ import ChatPage from "./Pages/ChatPage";
 import BookingPage from "./Pages/Bookingpage";
 import DoctorsListPage from './Pages/DoctorsListPage';
 import DoaaDahboard from "./Pages/DoaaDahboard";
+// import AProfile from "./Pages/profile";
 
 const cookies = new Cookies();
 function App() {
@@ -30,7 +29,7 @@ function App() {
   const [room, setRoom] = useState(null);
   const inputroomref = useRef(null);
   const location = useLocation();
-  const noHeaderFooterPages = ["/dashboard", "/admin", "/signIn", "/register"];
+  const noHeaderFooterPages = ["/ddashboard", "/admin", "/signIn", "/register"];
   return (
     <>
       {!noHeaderFooterPages.includes(location.pathname) && <Navbar />}
@@ -45,7 +44,6 @@ function App() {
         <Route path="/pharmacy/:departmentId" element={<Medicines />} />
         <Route path="/ContactUs" element={<ContactUs />} />
         <Route path="/admin" element={<Adminpage />} />
-        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/ddashboard" element={<DoaaDahboard />} />
         <Route path="/profile" element={<Profile />} />
         {/* <Route path="/DoctorList" element={<DoctorsList />} /> */}
@@ -54,6 +52,7 @@ function App() {
         <Route path="/chat/:chatId" element={<ChatPage />} />
         <Route path="/password-recovery" element={<PasswordRecovery />} />
         <Route path="/about" element={<About />} />
+        {/* <Route path="/aprofile" element={<AProfile />} /> */}
 
 
         <Route path="/change-password" element={<ChangePassword />} />

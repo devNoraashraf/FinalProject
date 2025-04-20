@@ -476,10 +476,63 @@ function Home() {
               ))}
             </div>
           )}
-
-
-
         </div>
+        {/* Pharmacy Section - خدمة طلب الأدوية */}
+<section className="py-20 bg-white">
+  <div className="container mx-auto px-4 flex flex-col-reverse md:flex-row items-center gap-12">
+    
+    {/* المحتوى النصي */}
+    <motion.div
+      className="md:w-1/2 text-right"
+      initial={{ opacity: 0, x: 50 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.8 }}
+    >
+      <h2 className="text-3xl md:text-4xl font-bold text-[#006272] mb-4">
+        اطلب أدويتك أونلاين بسهولة
+      </h2>
+      <p className="text-gray-600 mb-6 text-lg leading-relaxed">
+       اطلب أدويتك أونلاين من خلال موقعنا الإلكتروني. نقدم لك خدمة توصيل سريعة وآمنة لجميع الأدوية المطلوبة.
+      </p>
+      <ul className="text-gray-700 space-y-2 mb-6">
+        <li className="flex items-center justify-end gap-2">
+          <svg className="w-5 h-5 text-[#006272]" fill="currentColor" viewBox="0 0 20 20"><path d="M5 13l4 4L19 7" /></svg>
+          تشكيلة واسعة من الأدوية
+        </li>
+        <li className="flex items-center justify-end gap-2">
+          <svg className="w-5 h-5 text-[#006272]" fill="currentColor" viewBox="0 0 20 20"><path d="M5 13l4 4L19 7" /></svg>
+          توصيل سريع وآمن
+        </li>
+        <li className="flex items-center justify-end gap-2">
+          <svg className="w-5 h-5 text-[#006272]" fill="currentColor" viewBox="0 0 20 20"><path d="M5 13l4 4L19 7" /></svg>
+          استشارة دوائية إن لزم
+        </li>
+      </ul>
+      <Link to="/pharmacy">
+        <button className="bg-[#006272] hover:bg-[#008080] text-white px-6 py-3 rounded-lg font-semibold transition duration-300">
+          اطلب الآن
+        </button>
+      </Link>
+    </motion.div>
+
+    {/* صورة تمثل الخدمة */}
+    <motion.div
+      className="md:w-1/2"
+      initial={{ opacity: 0, x: -50 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.8 }}
+    >
+      <img
+        src="src/assets/pht.avif"
+        alt="طلب أدوية"
+        className="w-full h-auto rounded-xl shadow-lg"
+      />
+    </motion.div>
+  </div>
+</section>
+
       </section>
       {/* Appointment Section مع أنيميشن متميز */}
       <section className="py-20" style={{ backgroundColor: colors.primary }}>
@@ -759,16 +812,18 @@ function Home() {
               viewport={{ once: true }}
               transition={{ delay: 0.6, duration: 0.8 }}
             >
-              <motion.button
-                className={`bg-${colors.primary} hover:bg-${colors.primaryLight} text-white px-8 py-3 rounded-lg font-semibold text-lg transition duration-300`}
-                whileHover={{
-                  scale: 1.05,
-                  boxShadow: `0 0 15px ${colors.primaryLight}`
-                }}
-                whileTap={{ scale: 0.95 }}
-              >
+                 <motion.button
+              className={`bg-${colors.primary} hover:bg-${colors.primaryLight} text-black px-8 py-3 rounded-lg font-semibold text-lg transition duration-300`}
+              whileHover={{
+                scale: 1.05,
+                boxShadow: `0 0 15px ${colors.primaryLight}`
+              }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Link to="/ContactUs" className="block w-full h-full">
                 اتصل بنا الآن
-              </motion.button>
+              </Link>
+            </motion.button>
               <motion.button
                 className={`bg-white border border-${colors.primary} text-${colors.primary} hover:bg-gray-50 px-8 py-3 rounded-lg font-semibold text-lg transition duration-300`}
                 whileHover={{ scale: 1.05 }}
@@ -780,6 +835,67 @@ function Home() {
           </motion.div>
         </div>
       </section>
+      {/* App Promo Section */}
+<section className="py-20 bg-[#f0fbfc]">
+  <div className="container mx-auto px-6 flex flex-col-reverse md:flex-row items-center justify-between gap-12">
+
+    {/* النص */}
+    <motion.div
+      className="md:w-1/2 text-right"
+      initial={{ opacity: 0, x: 50 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.8 }}
+    >
+      <h2 className="text-4xl md:text-5xl font-bold text-[#006272] mb-6 leading-tight">
+        حمل تطبيقنا الآن
+      </h2>
+      <p className="text-gray-700 mb-8 text-lg leading-relaxed">
+        تابع مواعيدك، استلم إشعارات طبية، واطلب أدويتك بسهولة عبر تطبيقنا المتاح على جميع الأجهزة الذكية.
+      </p>
+
+      <div className="flex flex-col sm:flex-row gap-4 justify-end items-end">
+        {/* زر Google Play */}
+        <a href="#" target="_blank" rel="noopener noreferrer">
+          <img
+            src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
+            alt="تحميل من Google Play"
+            className="h-14 hover:scale-105 transition-transform duration-300"
+          />
+        </a>
+
+        {/* زر App Store محاط بخلفية بيضاء وظل */}
+        <a href="#" target="_blank" rel="noopener noreferrer">
+          <div className="bg-white rounded-lg shadow-md p-1 hover:scale-105 transition-transform duration-300">
+            <img
+              src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg"
+              alt="تحميل من App Store"
+              className="h-12"
+            />
+          </div>
+        </a>
+      </div>
+    </motion.div>
+
+    {/* صورة التطبيق */}
+    <motion.div
+      className="md:w-1/2 flex justify-center"
+      initial={{ opacity: 0, x: -50 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.8 }}
+    >
+      <img
+        src="src/assets/11.jpg"
+        alt="تطبيق موبايل"
+        className="w-full max-w-xs md:max-w-md rounded-3xl shadow-2xl border-4 border-white"
+      />
+    </motion.div>
+
+  </div>
+</section>
+
+
     </div>
   );
 }

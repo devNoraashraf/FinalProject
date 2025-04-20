@@ -1,9 +1,35 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { FaClinicMedical, FaUserMd, FaHeartbeat, FaHandsHelping, FaStethoscope } from "react-icons/fa";
 import { GiHealthNormal } from "react-icons/gi";
 import { Link } from "react-router-dom";
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from "/firebase-config"; // تأكد من المسار الصحيح لملف Firebase
 
 function About() {
+  const [doctors, setDoctors] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        const doctorsCollection = collection(db, 'Doctors');
+        const doctorsSnapshot = await getDocs(doctorsCollection);
+        const doctorsList = doctorsSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setDoctors(doctorsList);
+        setLoading(false);
+      } catch (err) {
+        setError(err.message);
+        setLoading(false);
+      }
+    };
+
+    fetchDoctors();
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -94,60 +120,51 @@ function About() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              {[
-                {
-                  name: "د. أحمد علي",
-                  specialty: "استشاري جراحة القلب",
-                  experience: "20 سنة خبرة",
-                  img: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
-                },
-                {
-                  name: "د. سارة محمد",
-                  specialty: "استشارية نساء وتوليد",
-                  experience: "15 سنة خبرة",
-                  img: "https://images.unsplash.com/photo-1594824476967-48c8b964273f?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
-                },
-                {
-                  name: "د. خالد عبدالله",
-                  specialty: "أخصائي جراحة العظام",
-                  experience: "18 سنة خبرة",
-                  img: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
-                },
-                {
-                  name: "د. نادية فاروق",
-                  specialty: "استشارية طب أطفال",
-                  experience: "12 سنة خبرة",
-                  img: "https://images.unsplash.com/photo-1579684385127-1ef15d508118?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
-                }
-              ].map((doctor, index) => (
-                <div key={index} className="group bg-white/10 rounded-xl p-6 hover:bg-white/20 transition-all duration-300">
-                  <div className="relative mb-6 overflow-hidden rounded-lg h-48">
-                    <img
-                      src={doctor.img}
-                      alt={doctor.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
-                      <span className="bg-[#00a3b8] px-3 py-1 rounded-full text-sm font-medium">
-                        {doctor.experience}
-                      </span>
+            {loading ? (
+              <div className="flex justify-center items-center h-48">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
+              </div>
+            ) : error ? (
+              <div className="text-center text-red-300 py-8">
+                <p>حدث خطأ في جلب بيانات الأطباء: {error}</p>
+                <button 
+                  onClick={() => window.location.reload()}
+                  className="mt-4 px-4 py-2 bg-white text-[#006272] rounded-lg"
+                >
+                  حاول مرة أخرى
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                {doctors.slice(0, 4).map((doctor) => (
+                  <div 
+                    key={doctor.id} 
+                    className="group bg-white/10 rounded-xl p-6 hover:bg-white/20 transition-all duration-300"
+                  >
+                    <div className="relative mb-6 overflow-hidden rounded-lg h-48">
+                      <img
+                        src={doctor.image || "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"}
+                        alt={doctor.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+                        <span className="bg-[#00a3b8] px-3 py-1 rounded-full text-sm font-medium">
+                          {doctor.experience || "خبرة واسعة"}
+                        </span>
+                      </div>
                     </div>
+                    <h3 className="text-xl font-bold mb-2">{doctor.name}</h3>
+                    <p className="text-[#a7e4ed] mb-4 flex items-center">
+                      <FaStethoscope className="mr-2 text-sm" /> 
+                      {doctor.specialty || "طبيب متخصص"}
+                    </p>
+                    
                   </div>
-                  <h3 className="text-xl font-bold mb-2">{doctor.name}</h3>
-                  <p className="text-[#a7e4ed] mb-4 flex items-center">
-                    <FaStethoscope className="mr-2 text-sm" /> {doctor.specialty}
-                  </p>
-                  <button className="text-sm w-full py-2 border border-white rounded-lg hover:bg-white hover:text-[#006272] transition-colors">
-                    عرض التفاصيل
-                  </button>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
 
-            <div className="text-center mt-12">
-
-            </div>
+            
           </div>
         </div>
 
@@ -159,13 +176,13 @@ function About() {
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link
-              to="/booking" // حجز موعد
+              to="/booking"
               className="px-8 py-3 bg-[#006272] text-white rounded-lg hover:bg-[#004d5a] transition-colors font-medium text-center"
             >
               احجز موعدًا الآن
             </Link>
             <Link
-              to="/ContactUs" // تواصل معنا
+              to="/ContactUs"
               className="px-8 py-3 border-2 border-[#006272] text-[#006272] rounded-lg hover:bg-[#006272]/10 transition-colors font-medium text-center"
             >
               تواصل معنا

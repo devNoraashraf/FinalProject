@@ -7,6 +7,8 @@ import Footer from "./Components/Footer";
 import Booking from "./Pages/BookingComponent";
 import Cards from "./Pages/Cards";
 import Medicines from "./Pages/Medicines";
+import Cart from "./Pages/Cart";
+import Checkout from "./Pages/Checkout";
 import Form from "./Pages/Form";
 import Card from "./Pages/Card";
 import ContactUs from "./Pages/ContactUs";
@@ -22,17 +24,24 @@ import BookingPage from "./Pages/Bookingpage";
 import DoctorsListPage from './Pages/DoctorsListPage';
 import DoaaDahboard from "./Pages/DoaaDahboard";
 // import AProfile from "./Pages/profile";
+import DoctorsList from './Pages/DoctorsList';
 
 const cookies = new Cookies();
+
 function App() {
   const [isAuth, setIsAuth] = useState(cookies.get("auth-token"));
   const [room, setRoom] = useState(null);
   const inputroomref = useRef(null);
   const location = useLocation();
-  const noHeaderFooterPages = ["/ddashboard", "/admin", "/signIn", "/register"];
+  const userType = cookies.get("userType");
+
+  const hideHeaderFooter =
+    ["/dashboard", "/ddashboard", "/admin", "/signIn", "/register"].includes(location.pathname) ||
+    (userType === "doctor" && location.pathname.startsWith("/d"));
+
   return (
     <>
-      {!noHeaderFooterPages.includes(location.pathname) && <Navbar />}
+      {!hideHeaderFooter && <Navbar />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/signIn" element={<SignIn />} />
@@ -42,11 +51,13 @@ function App() {
         <Route path="/pharmacy" element={<Card />} />
         <Route path="/MedicineForm" element={<Form />} />
         <Route path="/pharmacy/:departmentId" element={<Medicines />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/Checkout" element={<Checkout />} />
         <Route path="/ContactUs" element={<ContactUs />} />
         <Route path="/admin" element={<Adminpage />} />
         <Route path="/ddashboard" element={<DoaaDahboard />} />
         <Route path="/profile" element={<Profile />} />
-        {/* <Route path="/DoctorList" element={<DoctorsList />} /> */}
+        <Route path="/DoctorsList" element={<DoctorsList />} />
         <Route path="/booking/:doctorId" element={<BookingPage />} />
         <Route path="/doctors" element={<DoctorsListPage />} />
         <Route path="/chat/:chatId" element={<ChatPage />} />
@@ -56,14 +67,10 @@ function App() {
 
 
         <Route path="/change-password" element={<ChangePassword />} />
-
       </Routes>
-      {!noHeaderFooterPages.includes(location.pathname) && <Footer />}
+      {!hideHeaderFooter && <Footer />}
     </>
   );
 }
-
-
-
 
 export default App;

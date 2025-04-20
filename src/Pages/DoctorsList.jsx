@@ -1,22 +1,49 @@
 import React, { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
+import {db} from "../../firebase-config"; // استيراد Firestore
 import { motion } from "framer-motion";
-import { auth, db } from "../../firebase-config";
+import { FaSearch } from "react-icons/fa";
+import { useLocation } from "react-router-dom"; // ✅ تمت إضافته
 
-import { useNavigate } from "react-router-dom";
+
 import BookingPage from "./Bookingpage";
 import Modal from "react-modal";
 Modal.setAppElement("#root");
+
+
+
 const DoctorsList = () => {
+
+
+
+
   const [isOpen, setIsOpen] = useState(false);
   const [selectedDoctorId, setSelectedDoctorId] = useState(null);
+
+
+
   const [doctors, setDoctors] = useState([]);
   const [filteredDoctors, setFilteredDoctors] = useState([]);
-  const [specialtyFilter, setSpecialtyFilter] = useState(""); // تخزين التخصص المختار
-  const [specialties, setSpecialties] = useState([]); // قائمة التخصصات
-  const [isLoading, setIsLoading] = useState(true); // حالة التحميل
-  const [searchQuery, setSearchQuery] = useState(""); // حالة البحث
-  const navigate = useNavigate();
+  const [specialtyFilter, setSpecialtyFilter] = useState("");
+  const [governorateFilter, setGovernorateFilter] = useState("");
+  const [ratingFilter, setRatingFilter] = useState("");
+  const [priceFilter, setPriceFilter] = useState("");
+  const [specialties, setSpecialties] = useState([]);
+  const [governorates, setGovernorates] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const location = useLocation(); // ✅ تم إضافته
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    setSpecialtyFilter(queryParams.get("specialty") || "");
+    setGovernorateFilter(queryParams.get("governorate") || "");
+    setRatingFilter(queryParams.get("rating") || "");
+    setPriceFilter(queryParams.get("price") || "");
+    setSearchQuery(queryParams.get("search") || "");
+  }, [location.search]); // ✅ تم إضافته
+
+
   useEffect(() => {
     const fetchDoctors = async () => {
       const querySnapshot = await getDocs(collection(db, "Doctors"));
@@ -25,50 +52,75 @@ const DoctorsList = () => {
         name: doc.data().name || "",
         specialty: doc.data().specialty || "",
         governorate: doc.data().governorate || "",
+        price: doc.data().price || 0,
+        review: doc.data().review || 0,
         ...doc.data(),
       }));
-
+  
       setDoctors(doctorsData);
-      setFilteredDoctors(doctorsData);
-      setIsLoading(false);
-
-      const uniqueSpecialties = [...new Set(doctorsData.map((doc) => doc.specialty))].filter(
-        (specialty) => specialty !== undefined
-      );
+  
+      const uniqueSpecialties = [...new Set(doctorsData.map((doc) => doc.specialty))].filter(Boolean);
       setSpecialties(uniqueSpecialties);
-    };
-
-    fetchDoctors();
-  }, []);
-
-  const handleFilterChange = (event) => {
-    const selectedSpecialty = event.target.value;
-    setSpecialtyFilter(selectedSpecialty);
-
-    if (selectedSpecialty === "") {
-      setFilteredDoctors(doctors);
-    } else {
-      const filtered = doctors.filter((doc) => doc.specialty === selectedSpecialty);
-      setFilteredDoctors(filtered);
-    }
-  };
-
-  const handleSearchChange = (event) => {
-    const query = event.target.value;
-    setSearchQuery(query);
-
-    const filtered = doctors.filter((doctor) => {
-      const name = doctor.name ? doctor.name.toLowerCase() : "";
-      const specialty = doctor.specialty ? doctor.specialty.toLowerCase() : "";
-      const governorate = doctor.governorate ? doctor.governorate.toLowerCase() : "";
-
-      return (
-        name.includes(query.toLowerCase()) ||
-        specialty.includes(query.toLowerCase()) ||
-        governorate.includes(query.toLowerCase())
+  
+      const uniqueGovernorates = [...new Set(doctorsData.map((doc) => doc.governorate))].filter(Boolean);
+      setGovernorates(uniqueGovernorates);
+  
+      // بعد تحميل الداتا، طبق الفلاتر من URL
+      const queryParams = new URLSearchParams(location.search);
+      const specialty = queryParams.get("specialty") || "";
+      const governorate = queryParams.get("governorate") || "";
+      const rating = queryParams.get("rating") || "";
+      const price = queryParams.get("price") || "";
+      const search = queryParams.get("search") || "";
+  
+      setSpecialtyFilter(specialty);
+      setGovernorateFilter(governorate);
+      setRatingFilter(rating);
+      setPriceFilter(price);
+      setSearchQuery(search);
+  
+      // فلترة مباشرة بعد تعيين القيم
+      const filtered = doctorsData.filter((doc) =>
+        (specialty === "" || doc.specialty === specialty) &&
+        (governorate === "" || doc.governorate === governorate) &&
+        (rating === "" || doc.review >= parseFloat(rating)) &&
+        (price === "" ||
+          (price === "100" && doc.price < 100) ||
+          (price === "300" && doc.price < 300) ||
+          (price === "500" && doc.price < 500) ||
+          (price === "501" && doc.price >= 500)) &&
+        (search === "" || 
+          doc.name.toLowerCase().includes(search.toLowerCase()) || 
+          doc.specialty.toLowerCase().includes(search.toLowerCase()) || 
+          doc.governorate.toLowerCase().includes(search.toLowerCase()))
       );
-    });
+  
+      setFilteredDoctors(filtered);
+      setIsLoading(false);
+    };
+  
+    fetchDoctors();
+  }, [location.search]);
+  
+  useEffect(() => {
+    handleFilterChange();
+  }, [specialtyFilter, governorateFilter, ratingFilter, priceFilter, searchQuery]);
 
+  const handleFilterChange = () => {
+    let filtered = doctors.filter((doc) =>
+      (specialtyFilter === "" || doc.specialty === specialtyFilter) &&
+      (governorateFilter === "" || doc.governorate === governorateFilter) &&
+      (ratingFilter === "" || doc.review >= parseFloat(ratingFilter)) &&
+      (priceFilter === "" ||
+        (priceFilter === "100" && doc.price < 100) ||
+        (priceFilter === "300" && doc.price < 300) ||
+        (priceFilter === "500" && doc.price < 500) ||
+        (priceFilter === "501" && doc.price >= 500)) &&
+      (searchQuery === "" || 
+        doc.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        doc.specialty.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        doc.governorate.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
     setFilteredDoctors(filtered);
   };
 
@@ -77,67 +129,106 @@ const DoctorsList = () => {
   }
 
 
+
+
+
+
+
+
   const handleBooking = (id) => {
     setSelectedDoctorId(id); // حفظ الـ ID
     setIsOpen(true); // فتح الـ Modal
   };
 
- 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   return (
-    <div className="flex flex-col items-center gap-6 p-6 w-full  ">
-      <div className="flex flex-col gap-4 w-full max-w-md bg-white p-4 rounded-lg shadow-md">
-        <label className="text-lg font-semibold text-[#08473a]">اختر التخصص:</label>
-        
-        <select
-          value={specialtyFilter}
-          onChange={handleFilterChange}
-          className="p-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#08473a]"
+    <div className="flex flex-col items-center gap-6 p-6 w-full">
+    <div className="flex flex-col gap-4 w-full max-w-4xl bg-[#193849] p-4 rounded-lg shadow-md">
+      <div className="flex flex-row-reverse gap-4 items-center">
+        <button 
+          onClick={handleFilterChange} 
+          className="bg-[#4acbbf] text-white px-6 py-2 rounded-lg font-bold hover:bg-[#3ab0a5] transition"
         >
-          <option value="">كل التخصصات</option>
-          {specialties.map((specialty, index) => (
-            <option key={index} value={specialty}>
-              {specialty}
-            </option>
-          ))}
-        </select>
-
-        <input
-          type="text"
-          placeholder="ابحث باسم الطبيب أو التخصص أو المنطقة"
-          value={searchQuery}
-          onChange={handleSearchChange}
-          className="p-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#08473a]"
-        />
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full max-w-6xl">
-        {filteredDoctors.length === 0 ? (
-          <div className="text-center text-lg font-semibold text-gray-600">لا توجد نتائج لعرضها.</div>
-        ) : (
-          filteredDoctors.map((doctor) => (
-<motion.div 
-  key={doctor.id} 
-  className="bg-white p-4 rounded-lg shadow-lg text-center cursor-pointer transition-colors hover:bg-[#08473a] hover:text-white"
+          بحث
+        </button>
   
-  initial={{ opacity: 0, scale: 0.8 }}
-  animate={{ opacity: 1, scale: 1 }}
-  whileHover={{ scale: 1.05, boxShadow: "0px 10px 20px rgba(0, 0, 0, 0.2)" }}
-  transition={{ duration: 0.5 }}
->
-  <img
-    src={doctor.image || "https://png.pngtree.com/thumb_back/fh260/background/20220313/pngtree-doctor-man-with-stethoscope-in-hospital-image_1059265.jpg"}
-    alt={doctor.name}
-    className="w-full h-48 object-cover rounded-lg mb-4"
-  />
-  <h2 className="text-xl font-bold hover:text-white">{doctor.name}</h2>
-  <p className="hover:text-white"><strong>التخصص:</strong> {doctor.specialty}</p>
-  <p className="hover:text-white"><strong>المحافظة:</strong> {doctor.governorate}</p>
-  <p className="hover:text-white"><strong>السعر:</strong> {doctor.price} جنيه</p>
-  <p className="hover:text-white"><strong>التقييم:</strong> ⭐ {doctor.review}/5</p>
+        <div className="relative flex-grow">
+          <input
+            type="text"
+            placeholder="أو اكتب اسم الدكتور/المركز/المستشفى هنا..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="p-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4acbbf] pr-10 bg-white"
+          />
+          <FaSearch className="absolute right-3 top-3 text-gray-500" />
+        </div>
+      </div>
+  
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <select value={specialtyFilter} onChange={(e) => setSpecialtyFilter(e.target.value)} className="p-2 border rounded-lg bg-white">
+          <option value="">اختر التخصص</option>
+          {specialties.map((specialty, index) => <option key={index} value={specialty}>{specialty}</option>)}
+        </select>
+        <select value={governorateFilter} onChange={(e) => setGovernorateFilter(e.target.value)} className="p-2 border rounded-lg bg-white">
+          <option value="">اختر المحافظة</option>
+          {governorates.map((gov, index) => <option key={index} value={gov}>{gov}</option>)}
+        </select>
+        <select value={ratingFilter} onChange={(e) => setRatingFilter(e.target.value)} className="p-2 border rounded-lg bg-white">
+          <option value="">التقييم</option>
+          <option value="4">4+ ⭐</option>
+          <option value="3">3+ ⭐</option>
+        </select>
+        <select value={priceFilter} onChange={(e) => setPriceFilter(e.target.value)} className="p-2 border rounded-lg">
+            <option value="">السعر</option>
+            <option value="100">أقل من 100</option>
+            <option value="300">أقل من 300</option>
+            <option value="500">أقل من 500</option>
+            <option value="501">فوق 500</option>
+          </select>
+      </div>
+    </div>
+  
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full max-w-6xl">
+      {filteredDoctors.length === 0 ? (
+        <div className="text-center text-lg font-semibold text-gray-600">لا توجد نتائج لعرضها.</div>
+      ) : (
+        filteredDoctors.map((doctor) => (
+          <motion.div 
+            key={doctor.id} 
+            className="bg-white p-4 rounded-lg shadow-lg text-center cursor-pointer transition-colors hover:bg-[#193849] hover:text-white"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.5 }}
+          >
+            <img src={doctor.image || "https://png.pngtree.com/thumb_back/fh260/background/20220313/pngtree-doctor-man-with-stethoscope-in-hospital-image_1059265.jpg"} alt={doctor.name} className="w-full h-48 object-cover rounded-lg mb-4" />
+            <h2 className="text-xl font-bold">{doctor.name}</h2>
+            <p><strong>التخصص:</strong> {doctor.specialty}</p>
+            <p><strong>المحافظة:</strong> {doctor.governorate}</p>
+            <p><strong>السعر:</strong> {doctor.price} جنيه</p>
+            <p><strong>التقييم:</strong> ⭐ {doctor.review}/5</p>
 
-  <button
+
+
+
+<button
         onClick={() => handleBooking(doctor.id)}
-        className="mt-4 bg-[#08473a] text-white px-4 py-2 rounded-lg transition-colors duration-300 hover:bg-white hover:text-[#08473a]"
+        className="mt-4 bg-[#193849] text-white px-4 py-2 rounded-lg transition-colors duration-300 hover:bg-white hover:text-[#08473a]"
       >
         احجز الموعد
       </button>
@@ -152,8 +243,7 @@ const DoctorsList = () => {
   <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-300 text-center relative">
     <h2 className="text-xl font-bold mb-4 text-gray-800">حجز الموعد</h2>
     
-    <BookingPage doctorId={selectedDoctorId} />
-    
+    <BookingPage doctorId={selectedDoctorId}  closeModal={() => setIsOpen(false)} />    
     <button
       className="mt-4 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition duration-300"
       onClick={() => setIsOpen(false)}
@@ -164,13 +254,15 @@ const DoctorsList = () => {
 </Modal>
 
 
- 
-</motion.div>
 
-          ))
-        )}
-      </div>
+
+
+
+          </motion.div>
+        ))
+      )}
     </div>
+  </div>
   );
 };
 

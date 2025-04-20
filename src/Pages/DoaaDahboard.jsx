@@ -8,7 +8,7 @@ import useAuthStore from "../../store";
 import { getAuth } from "firebase/auth";
 
 // مكون الشريط الجانبي
-const Sidebar = ({ setPage, page  }) => {
+const Sidebar = ({ setPage, page }) => {
   const user = useAuthStore((state) => state.user);
   const doctorId = user.uid;
   const [doctorName, setDoctorName] = useState("...جاري التحميل");
@@ -21,8 +21,8 @@ const Sidebar = ({ setPage, page  }) => {
         const doctorRef = doc(db, "Doctors", doctorId);
         const docSnap = await getDoc(doctorRef);
         if (docSnap.exists()) {
-          setDoctorName(docSnap.data().name); 
-          setDoctorImage(docSnap.data().profileImage); 
+          setDoctorName(docSnap.data().name);
+          setDoctorImage(docSnap.data().profileImage);
         }
       } catch (error) {
         console.error("خطأ في جلب بيانات الطبيب:", error);
@@ -42,7 +42,7 @@ const Sidebar = ({ setPage, page  }) => {
       <nav className="mt-6">
         <ul className="flex flex-col gap-2">
           <li>
-            <button 
+            <button
               className={`w-full py-2 rounded transition ${page === "dashboard" ? "bg-[#09243c] text-white" : "bg-gray-700 hover:bg-gray-600"}`}
               onClick={() => setPage("dashboard")}
             >
@@ -50,7 +50,7 @@ const Sidebar = ({ setPage, page  }) => {
             </button>
           </li>
           <li>
-            <button 
+            <button
               className={`w-full py-2 rounded transition ${page === "appointments" ? "bg-[#09243c] text-white" : "bg-gray-700 hover:bg-gray-600"}`}
               onClick={() => setPage("appointments")}
             >
@@ -58,7 +58,7 @@ const Sidebar = ({ setPage, page  }) => {
             </button>
           </li>
           <li>
-            <button 
+            <button
               className={`w-full py-2 rounded transition ${page === "BookingsPage" ? "bg-[#09243c] text-white" : "bg-gray-700 hover:bg-gray-600"}`}
               onClick={() => setPage("BookingsPage")}
             >
@@ -66,7 +66,7 @@ const Sidebar = ({ setPage, page  }) => {
             </button>
           </li>
           <li>
-            <button 
+            <button
               className={`w-full py-2 rounded transition ${page === "chats" ? "bg-[#09243c] text-white" : "bg-gray-700 hover:bg-gray-600"}`}
               onClick={() => setPage("chats")}
             >
@@ -74,7 +74,7 @@ const Sidebar = ({ setPage, page  }) => {
             </button>
           </li>
           <li>
-            <button 
+            <button
               className={`w-full py-2 rounded transition ${page === "DoctorProfile" ? "bg-[#09243c] text-white" : "bg-gray-700 hover:bg-gray-600"}`}
               onClick={() => setPage("DoctorProfile")}
             >
@@ -82,6 +82,22 @@ const Sidebar = ({ setPage, page  }) => {
             </button>
           </li>
         </ul>
+        <li>
+          <button
+            onClick={async () => {
+              try {
+                await auth.signOut();
+                window.location.href = "/signIn";
+              } catch (error) {
+                console.error("فشل تسجيل الخروج:", error);
+              }
+            }}
+            className="w-full py-2 rounded transition bg-red-600 hover:bg-red-700"
+          >
+            تسجيل الخروج
+          </button>
+        </li>
+
       </nav>
     </div>
   );
@@ -138,7 +154,7 @@ const ChatsPage = ({ doctorName }) => {
             <i className="fas fa-search"></i>
           </span>
         </div>
-        
+
         {filteredChats.length === 0 ? (
           <div className="text-center py-10">
             <p className="text-gray-500 text-lg">لا توجد محادثات متاحة حالياً</p>
@@ -167,7 +183,7 @@ const ChatsPage = ({ doctorName }) => {
                     )}
                   </div>
                   <div>
-                  <p className="font-medium text-gray-800">{chat.patientInfo?.name || "مريض"}</p>
+                    <p className="font-medium text-gray-800">{chat.patientInfo?.name || "مريض"}</p>
                     <p className="text-sm text-gray-500">
                       {chat.lastMessage?.substring(0, 30) || "لا توجد رسائل بعد..."}
                     </p>
@@ -229,11 +245,11 @@ const DoctorDashboard = () => {
       setLoading(true);
       const doctorRef = doc(db, "Doctors", doctorId);
       const appointmentsRef = collection(doctorRef, "appointments");
-      await addDoc(appointmentsRef, { 
-        date: formattedDate, 
-        startTime, 
-        endTime, 
-        isBooked: false 
+      await addDoc(appointmentsRef, {
+        date: formattedDate,
+        startTime,
+        endTime,
+        isBooked: false
       });
 
       setAppointments([...appointments, { date: formattedDate, startTime, endTime, isBooked: false }]);
@@ -250,7 +266,7 @@ const DoctorDashboard = () => {
     <div className="flex justify-center mt-10">
       <div className="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md">
         <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">تحديد المواعيد</h2>
-        
+
         <div className="space-y-4">
           <div>
             <label className="block text-gray-600 font-medium mb-1">وقت البداية</label>
@@ -261,7 +277,7 @@ const DoctorDashboard = () => {
               className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#09243c] focus:border-transparent"
             />
           </div>
-  
+
           <div>
             <label className="block text-gray-600 font-medium mb-1">وقت النهاية</label>
             <input
@@ -271,7 +287,7 @@ const DoctorDashboard = () => {
               className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#09243c] focus:border-transparent"
             />
           </div>
-  
+
           <div className="pt-2">
             <button
               onClick={() => setShowCalendar(!showCalendar)}
@@ -280,7 +296,7 @@ const DoctorDashboard = () => {
               {showCalendar ? "إخفاء التقويم" : "حدد تاريخ الموعد"}
             </button>
           </div>
-  
+
           {showCalendar && (
             <div className="mt-4">
               <Calendar
@@ -371,7 +387,7 @@ const AppointmentsPage = () => {
     <div className="flex justify-center mt-10">
       <div className="bg-white p-6 rounded-2xl shadow-xl w-full max-w-2xl mx-4">
         <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">مواعيدي</h2>
-        
+
         {appointments.length === 0 ? (
           <div className="text-center py-10">
             <p className="text-gray-500 text-lg">لا توجد مواعيد مسجلة</p>
@@ -392,13 +408,13 @@ const AppointmentsPage = () => {
                   </p>
                 </div>
                 <div className="flex gap-2">
-                  <button 
+                  <button
                     className="bg-[#09243c] hover:bg-[#0d2e4d] text-white px-4 py-2 rounded-lg transition"
                     onClick={() => handleEdit(appointment.id)}
                   >
                     تعديل
                   </button>
-                  <button 
+                  <button
                     className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition"
                     onClick={() => handleDelete(appointment.id)}
                   >
@@ -446,7 +462,7 @@ const BookingsPage = () => {
     <div className="flex justify-center mt-10">
       <div className="bg-white p-6 rounded-2xl shadow-xl w-full max-w-4xl mx-4">
         <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">حجوزاتي</h2>
-        
+
         <div className="grid md:grid-cols-2 gap-6">
           <div className="bg-gray-50 p-4 rounded-lg">
             <h3 className="text-lg font-semibold text-gray-700 mb-4 text-center">الحجوزات القادمة</h3>
@@ -685,7 +701,7 @@ const DashboardPage = () => {
 
   return (
     <div className="flex min-h-screen bg-gray-100" dir="rtl">
-      <Sidebar setPage={setPage} page={page}  />
+      <Sidebar setPage={setPage} page={page} />
       <main className="flex-1 p-4 md:p-6 overflow-auto">
         {page === "dashboard" && <DoctorDashboard />}
         {page === "appointments" && <AppointmentsPage />}

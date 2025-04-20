@@ -4,17 +4,17 @@ import { doc, collection, addDoc, getDocs, updateDoc } from "firebase/firestore"
 import { auth, db } from "../../firebase-config";
 import useAuthStore from "../../store";
 
-const BookingPage = ({ doctorId }) => {
+const BookingPage = ({ doctorId,closeModal }) => {
   console.log(doctorId);
-  
+
   // const { doctorId } = useParams(); // استخراج doctorId من الرابط
   const [appointments, setAppointments] = useState([]);
   const [selectedTime, setSelectedTime] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
-  
- 
+  const [isLoading, setIsLoading] = useState(true);
+
   const user = useAuthStore((state) => state.user);
-console.log(user)
+  console.log(user)
   useEffect(() => {
     const fetchAppointments = async () => {
       if (!doctorId) {
@@ -32,7 +32,7 @@ console.log(user)
           .map((doc) => ({ id: doc.id, ...doc.data() }))
           .filter((appointment) => {
             console.log("Appointment Data:", appointment);
-            
+
             if (appointment.isBooked) return false; // استبعاد المواعيد المحجوزة
 
             const appointmentDateTime = new Date(`${appointment.date}T${appointment.startTime}:00`);
@@ -46,7 +46,9 @@ console.log(user)
         console.log("Available Appointments:", availableAppointments);
       } catch (error) {
         console.error("Error fetching appointments:", error);
-      }
+      }finally {
+        setIsLoading(false); // ✅ نوقف التحميل بعد ما نخلص
+      }
     };
 
     fetchAppointments();
@@ -85,7 +87,7 @@ console.log(user)
         date: selectedDate,
         time: selectedTime,
         patientName: user.name,
-       
+
         patientEmail: user.email,
         createdAt: new Date(),
       });
@@ -96,54 +98,61 @@ console.log(user)
       alert("تم حجز الموعد بنجاح!");
       setSelectedTime("");
       setSelectedDate("");
-     
+      closeModal();
+
     } catch (error) {
       console.error("خطأ في الحجز: ", error);
     }
   };
 
+
+
   return (
     <div className="p-6 bg-white rounded-lg shadow-lg max-w-md mx-auto">
-    <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2 mb-4">
-      📅 اختر موعد الحجز
-    </h2>
+  
+    
+    {isLoading ? (
+  <p className="text-gray-500 text-center"> جاري تحميل المواعيد...</p>
+) : appointments.length > 0 ? (
+  
+  <div className="space-y-3">
     <h4 className="text-lg text-gray-600 mb-3">المواعيد المتاحة</h4>
-  
-    {appointments.length > 0 ? (
-      <div className="space-y-3">
-        {appointments.map((appointment) => (
-          <div
-            key={appointment.id}
-            className={`p-4 rounded-lg border transition-all duration-300 cursor-pointer ${
-              selectedTime === appointment.startTime && selectedDate === appointment.date
-                ? "bg-[#4acbbf] text-white  shadow-lg"
-                : "bg-gray-100 hover:bg-gray-200 border-gray-300"
-            }`}
-            onClick={() => {
-              if (selectedTime === appointment.startTime && selectedDate === appointment.date) {
-                // إذا تم الضغط مرة أخرى، يتم إلغاء التحديد
-                setSelectedTime(null);
-                setSelectedDate(null);
-              } else {
-                // إذا لم يكن محددًا، يتم التحديد
-                setSelectedTime(appointment.startTime);
-                setSelectedDate(appointment.date);
-              }
-            }}
-          >
-            <span className="font-semibold">{appointment.date}</span> - 
-            <span className="ml-2">{appointment.startTime} إلى {appointment.endTime}</span>
-          </div>
-        ))}
+    {appointments.map((appointment) => (
+      <div
+        key={appointment.id}
+        className={`p-4 rounded-lg border transition-all duration-300 cursor-pointer ${
+          selectedTime === appointment.startTime && selectedDate === appointment.date
+            ? "bg-[#4acbbf] text-white shadow-lg"
+            : "bg-gray-100 hover:bg-gray-200 border-gray-300"
+        }`}
+        onClick={() => {
+          if (
+            selectedTime === appointment.startTime &&
+            selectedDate === appointment.date
+          ) {
+            setSelectedTime(null);
+            setSelectedDate(null);
+          } else {
+            setSelectedTime(appointment.startTime);
+            setSelectedDate(appointment.date);
+          }
+        }}
+      >
+        <span className="font-semibold">{appointment.date}</span> - 
+        <span className="ml-2">
+          {appointment.startTime} إلى {appointment.endTime}
+        </span>
       </div>
-    ) : (
-      <p className="text-gray-500 text-center">لا توجد مواعيد متاحة</p>
-    )}
-  
+    ))}
+  </div>
+) : (
+  <p className="text-gray-500 text-center">لا توجد مواعيد متاحة</p>
+)}
+
     <button
       className={`mt-6 w-full py-3 text-lg font-bold rounded-lg transition-all duration-300 ${
         selectedTime && selectedDate
-          ? "bg-[rgb(8,71,58)] text-white hover:bg-[rgba(8,71,58,0.8)]"
+          ? "bg-[#193849] text-white ]"
           : "bg-gray-400 text-gray-700 cursor-not-allowed"
       }`}
       onClick={handleBooking}

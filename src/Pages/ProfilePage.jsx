@@ -66,16 +66,38 @@ const Profile = () => {
       const chatsRef = collection(db, "Chats");
       const q = query(chatsRef, where("participants", "array-contains", uid));
       const querySnapshot = await getDocs(q);
-
-      const chatList = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
+  
+      const chatList = await Promise.all(querySnapshot.docs.map(async (docSnap) => {
+        const data = docSnap.data();
+        let doctorName = data.doctorName;
+  
+        // لو مفيش اسم دكتور، نجيبه من جدول الأطباء
+        if (!doctorName && data.doctorUid) {
+          try {
+            const doctorDoc = await getDoc(doc(db, "Doctors", data.doctorUid));
+            if (doctorDoc.exists()) {
+              doctorName = doctorDoc.data().name || "طبيب بدون اسم";
+            } else {
+              doctorName = "طبيب غير معروف";
+            }
+          } catch {
+            doctorName = "طبيب غير معروف";
+          }
+        }
+  
+        return {
+          id: docSnap.id,
+          ...data,
+          doctorName,
+        };
       }));
+  
       setChats(chatList);
     } catch (error) {
       console.error("خطأ في جلب المحادثات:", error);
     }
   };
+  
 
   const handleLogout = () => {
     auth.signOut().then(() => {
@@ -136,24 +158,55 @@ const Profile = () => {
             <>
               <h2 className="text-2xl font-bold text-gray-800 mb-4">💬 دردشاتي</h2>
               {chats.length > 0 ? (
-                chats.map(chat => (
-                  <div
-                    key={chat.id}
-                    className="bg-gray-100 p-3 rounded-md flex justify-between items-center mb-2 transition-all duration-300 hover:bg-[#3ab0a5] cursor-pointer"
-                    onClick={() => navigate(`/chat/${chat.id}`, {
-                      state: {
-                        doctorId: chat.doctorUid,
-                        doctorName: chat.doctorName
-                      }
-                    })}
-                  >
-                    <span>مع {chat.doctorName || "طبيب غير معروف"} - {chat.lastMessage?.substring(0, 30) || "لا توجد رسائل"}</span>
-                    <span className="text-sm text-gray-500">{chat.lastMessageTime || ""}</span>
-                  </div>
-                ))
-              ) : (
-                <p className="text-gray-500">لا توجد محادثات</p>
-              )}
+  chats.map(chat => (
+    <div
+      key={chat.id}
+      className="bg-gray-100 p-3 rounded-md flex justify-between items-center mb-2 transition-all duration-300 hover:bg-[#3ab0a5] cursor-pointer"
+      onClick={() =>
+        navigate(`/chat/${chat.id}`, {
+          state: {
+            doctorId: chat.doctorUid,
+            doctorName: chat.doctorName
+          }
+        })
+      }
+    >
+      {/* بيانات الدكتور */}
+      <div className="flex items-center gap-3">
+        {/* صورة أو أول حرف */}
+        {chat.doctorInfo?.profileImage ? (
+          <img
+            src={chat.doctorInfo.profileImage}
+            alt="صورة الدكتور"
+            className="w-10 h-10 rounded-full object-cover border"
+          />
+        ) : (
+          <div className="w-10 h-10 rounded-full bg-[#193849] text-white flex items-center justify-center text-lg font-bold">
+            {chat.doctorInfo?.name?.charAt(0) || "؟"}
+          </div>
+        )}
+
+        {/* اسم وآخر رسالة */}
+        <div className="flex flex-col">
+          <span className="text-sm font-semibold text-gray-800">
+            مع {chat.doctorInfo?.name || "طبيب غير معروف"}
+          </span>
+          <span className="text-xs text-gray-700">
+            {chat.lastMessage?.substring(0, 30) || "لا توجد رسائل"}
+          </span>
+        </div>
+      </div>
+
+      {/* توقيت آخر رسالة */}
+      <span className="text-xs text-gray-500">
+        {chat.lastMessageTime || ""}
+      </span>
+    </div>
+  ))
+) : (
+  <p className="text-gray-500">لا توجد محادثات</p>
+)}
+
             </>
           )}
         </div>

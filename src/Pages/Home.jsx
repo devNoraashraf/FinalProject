@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from "react-router-dom";
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from "/firebase-config";// Adjust the import path as needed
+
 // الألوان الجديدة
 const colors = {
   primary: '#006272',
@@ -10,31 +13,6 @@ const colors = {
   textDark: '#1a365d',
   textLight: '#f7fafc'
 };
-
-// بيانات الأطباء
-const doctors = [
-  {
-    id: 1,
-    name: "د. أحمد محمود",
-    specialty: "أخصائي قلب وأوعية دموية",
-    experience: "15 سنة خبرة",
-    image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
-  },
-  {
-    id: 2,
-    name: "د. سارة عبد الله",
-    specialty: "أخصائية أطفال",
-    experience: "10 سنوات خبرة",
-    image: "https://images.unsplash.com/photo-1594824476967-48c8b964273f?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
-  },
-  {
-    id: 3,
-    name: "د. محمد علي",
-    specialty: "أخصائي جلدية",
-    experience: "12 سنة خبرة",
-    image: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
-  }
-];
 
 // بيانات الخدمات
 const services = [
@@ -134,6 +112,30 @@ const ServiceCard = ({ service, index }) => (
 );
 
 function Home() {
+  const [doctors, setDoctors] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        const doctorsCollection = collection(db, 'Doctors');
+        const doctorsSnapshot = await getDocs(doctorsCollection);
+        const doctorsList = doctorsSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setDoctors(doctorsList);
+        setLoading(false);
+      } catch (err) {
+        setError(err.message);
+        setLoading(false);
+      }
+    };
+
+    fetchDoctors();
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section مع أنيميشن متطور */}
@@ -224,7 +226,6 @@ function Home() {
                 scale: 1.05,
                 boxShadow: `0 0 15px ${colors.primaryLight}`
               }}
-
               whileTap={{ scale: 0.95 }}
             >
               <Link to="/booking" className="block w-full h-full">
@@ -255,124 +256,124 @@ function Home() {
         </motion.div>
       </section>
 
-      {/* Services Section مع أنيميشن متعدد */}
       {/* Services Section مع تصميم محسن */}
-<section className="py-20 bg-white">
-  <div className="container mx-auto px-4">
-    <motion.div
-      className="text-center mb-16"
-      initial={{ opacity: 0, y: 50 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.8 }}
-    >
-      <h2 className="text-3xl md:text-4xl font-bold text-[#006272] mb-4">
-        خدماتنا الطبية المتكاملة
-      </h2>
-      <div className="w-24 h-1 bg-[#006272] mx-auto mb-6"></div>
-      <p className="text-gray-600 max-w-2xl mx-auto text-lg">
-        نقدم حزمة متكاملة من الخدمات الطبية بأعلى معايير الجودة
-      </p>
-    </motion.div>
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <motion.div
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-[#006272] mb-4">
+              خدماتنا الطبية المتكاملة
+            </h2>
+            <div className="w-24 h-1 bg-[#006272] mx-auto mb-6"></div>
+            <p className="text-gray-600 max-w-2xl mx-auto text-lg">
+              نقدم حزمة متكاملة من الخدمات الطبية بأعلى معايير الجودة
+            </p>
+          </motion.div>
 
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-      {/* خدمة التشخيص */}
-      <motion.div
-        className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100"
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6, delay: 0.1 }}
-        whileHover={{ y: -10 }}
-      >
-        <div className="h-48 bg-gradient-to-r from-blue-50 to-cyan-50 flex items-center justify-center">
-          <div className="text-6xl">🩺</div>
-        </div>
-        <div className="p-6 text-right">
-          <h3 className="text-xl font-bold text-[#006272] mb-3">تشخيص الأمراض</h3>
-          <ul className="space-y-2 text-gray-600">
-            <li className="flex items-start">
-              <span className="text-[#006272] mr-2">•</span>
-              تشخيص دقيق بالذكاء الاصطناعي
-            </li>
-            <li className="flex items-start">
-              <span className="text-[#006272] mr-2">•</span>
-        دليلك للذهاب إلى الطبيب
-            </li>
-            <li className="flex items-start">
-              <span className="text-[#006272] mr-2">•</span>
-              اختيارك للطبيب المناسب
-            </li>
-          </ul>
-        </div>
-      </motion.div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* خدمة التشخيص */}
+            <motion.div
+              className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100"
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              whileHover={{ y: -10 }}
+            >
+              <div className="h-48 bg-gradient-to-r from-blue-50 to-cyan-50 flex items-center justify-center">
+                <div className="text-6xl">🩺</div>
+              </div>
+              <div className="p-6 text-right">
+                <h3 className="text-xl font-bold text-[#006272] mb-3">تشخيص الأمراض</h3>
+                <ul className="space-y-2 text-gray-600">
+                  <li className="flex items-start">
+                    <span className="text-[#006272] mr-2">•</span>
+                    تشخيص دقيق بالذكاء الاصطناعي
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-[#006272] mr-2">•</span>
+                    دليلك للذهاب إلى الطبيب
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-[#006272] mr-2">•</span>
+                    اختيارك للطبيب المناسب
+                  </li>
+                </ul>
+              </div>
+            </motion.div>
 
-      {/* خدمة حجز الأطباء */}
-      <motion.div
-        className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100"
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6, delay: 0.2 }}
-        whileHover={{ y: -10 }}
-      >
-        <div className="h-48 bg-gradient-to-r from-blue-50 to-cyan-50 flex items-center justify-center">
-          <div className="text-6xl">👨‍⚕️</div>
-        </div>
-        <div className="p-6 text-right">
-          <h3 className="text-xl font-bold text-[#006272] mb-3">حجز الأطباء</h3>
-          <ul className="space-y-2 text-gray-600">
-            <li className="flex items-start">
-              <span className="text-[#006272] mr-2">•</span>
-              أكبر شبكة أطباء متخصصين
-            </li>
-            <li className="flex items-start">
-              <span className="text-[#006272] mr-2">•</span>
-              حجز موعد في دقائق
-            </li>
-            <li className="flex items-start">
-              <span className="text-[#006272] mr-2">•</span>
-              استشارة الدكتور فورا
-            </li>
-          </ul>
-        </div>
-      </motion.div>
+            {/* خدمة حجز الأطباء */}
+            <motion.div
+              className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100"
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              whileHover={{ y: -10 }}
+            >
+              <div className="h-48 bg-gradient-to-r from-blue-50 to-cyan-50 flex items-center justify-center">
+                <div className="text-6xl">👨‍⚕️</div>
+              </div>
+              <div className="p-6 text-right">
+                <h3 className="text-xl font-bold text-[#006272] mb-3">حجز الأطباء</h3>
+                <ul className="space-y-2 text-gray-600">
+                  <li className="flex items-start">
+                    <span className="text-[#006272] mr-2">•</span>
+                    أكبر شبكة أطباء متخصصين
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-[#006272] mr-2">•</span>
+                    حجز موعد في دقائق
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-[#006272] mr-2">•</span>
+                    استشارة الدكتور فورا
+                  </li>
+                </ul>
+              </div>
+            </motion.div>
 
-      {/* خدمة الصيدلية */}
-      <motion.div
-        className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100"
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6, delay: 0.3 }}
-        whileHover={{ y: -10 }}
-      >
-        <div className="h-48 bg-gradient-to-r from-blue-50 to-cyan-50 flex items-center justify-center">
-          <div className="text-6xl">💊</div>
+            {/* خدمة الصيدلية */}
+            <motion.div
+              className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100"
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              whileHover={{ y: -10 }}
+            >
+              <div className="h-48 bg-gradient-to-r from-blue-50 to-cyan-50 flex items-center justify-center">
+                <div className="text-6xl">💊</div>
+              </div>
+              <div className="p-6 text-right">
+                <h3 className="text-xl font-bold text-[#006272] mb-3">خدمة الصيدلية</h3>
+                <ul className="space-y-2 text-gray-600">
+                  <li className="flex items-start">
+                    <span className="text-[#006272] mr-2">•</span>
+                    طلب أدوية أونلاين
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-[#006272] mr-2">•</span>
+                    توصيل سريع للمنزل
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-[#006272] mr-2">•</span>
+                    جميع الأدوية لدينا
+                  </li>
+                </ul>
+              </div>
+            </motion.div>
+          </div>
         </div>
-        <div className="p-6 text-right">
-          <h3 className="text-xl font-bold text-[#006272] mb-3">خدمة الصيدلية</h3>
-          <ul className="space-y-2 text-gray-600">
-            <li className="flex items-start">
-              <span className="text-[#006272] mr-2">•</span>
-              طلب أدوية أونلاين
-            </li>
-            <li className="flex items-start">
-              <span className="text-[#006272] mr-2">•</span>
-              توصيل سريع للمنزل
-            </li>
-            <li className="flex items-start">
-              <span className="text-[#006272] mr-2">•</span>
-               جميع الأدوية لدينا
-            </li>
-          </ul>
-        </div>
-      </motion.div>
-    </div>
-  </div>
-</section>
+      </section>
 
-      {/* Doctors Section مع أنيميشن متطور */}
+      {/* Doctors Section المعدل لجلب البيانات من Firebase */}
+      {/* Doctors Section المعدل لجلب البيانات من Firebase */}
       <section className="py-20 bg-gray-50">
         <div className="container mx-auto px-4">
           <motion.div
@@ -382,22 +383,8 @@ function Home() {
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8 }}
           >
-            <motion.h2
-              className="text-3xl md:text-4xl font-bold text-gray-800 mb-4"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2, duration: 0.8 }}
-            >
-              فريق أطبائنا
-            </motion.h2>
-            <motion.div
-              className="w-24 h-1 bg-gray-300 mx-auto mb-6 overflow-hidden"
-              initial={{ scaleX: 0 }}
-              whileInView={{ scaleX: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.4, duration: 0.8 }}
-            >
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">فريق أطبائنا</h2>
+            <div className="w-24 h-1 bg-gray-300 mx-auto mb-6 overflow-hidden">
               <motion.div
                 className="h-full"
                 style={{ backgroundColor: colors.primary }}
@@ -406,61 +393,94 @@ function Home() {
                 viewport={{ once: true }}
                 transition={{ delay: 0.6, duration: 0.8 }}
               />
-            </motion.div>
-            <motion.p
-              className="text-gray-600 max-w-2xl mx-auto text-lg"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.8, duration: 0.8 }}
-            >
+            </div>
+            <p className="text-gray-600 max-w-2xl mx-auto text-lg">
               تعرف على فريقنا من الأطباء المتخصصين ذوي الخبرة الواسعة
-            </motion.p>
+            </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {doctors.map((doctor, index) => (
-              <motion.div
-                key={doctor.id}
-                className="bg-white rounded-xl shadow-md overflow-hidden text-center"
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 0.6, delay: index * 0.15 }}
-                whileHover={{
-                  y: -10,
-                  boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
-                }}
-              >
+          {loading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+          ) : error ? (
+            <div className="text-center text-red-500 py-10">
+              <p>حدث خطأ في جلب بيانات الأطباء: {error}</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {doctors.slice(0, 3).map((doctor, index) => (
                 <motion.div
-                  className="w-full h-64 overflow-hidden"
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ duration: 0.3 }}
+                  key={doctor.id}
+                  className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
+                  initial={{ opacity: 0, y: 50 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-100px" }}
+                  transition={{ duration: 0.6, delay: index * 0.15 }}
+                  whileHover={{
+                    y: -10,
+                    boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
+                  }}
                 >
-                  <img
-                    src={doctor.image}
-                    alt={doctor.name}
-                    className="w-full h-full object-cover"
-                  />
-                </motion.div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-800 mb-1">{doctor.name}</h3>
-                  <p className={`text-${colors.primary} font-semibold mb-2`}>{doctor.specialty}</p>
-                  <p className="text-gray-500 text-sm mb-4">{doctor.experience}</p>
-                  <motion.button
-                    className={`bg-${colors.primary} hover:bg-${colors.primaryLight} text-white px-6 py-2 rounded-lg transition duration-300`}
+                  {/* صورة الطبيب مع تأثير حركي */}
+                  <motion.div
+                    className="w-full h-64 overflow-hidden relative"
                     whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                    transition={{ duration: 0.3 }}
                   >
-                    احجز مع الطبيب
-                  </motion.button>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+                    <img
+                      src={doctor.image || "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"}
+                      alt={doctor.name}
+                      className="w-full h-full object-cover"
+                    />
+                    {/* شريط التخصص */}
+                    <div
+                      className="absolute bottom-0 right-0 bg-[#006272] text-white px-4 py-2 text-sm font-medium"
+                      style={{ backgroundColor: colors.primary }}
+                    >
+                      {doctor.specialty}
+                    </div>
+                  </motion.div>
+
+                  {/* محتوى البطاقة */}
+                  <div className="p-6 text-right">
+                    {/* اسم الطبيب */}
+                    <h3 className="text-xl font-bold text-gray-800 mb-2">{doctor.name}</h3>
+
+                  
+
+                    {/* التقييم */}
+                    {typeof doctor.review === "number" && (
+                      <div className="flex items-center mb-4">
+                        <StarRating rating={doctor.review} />
+                        <span className="text-gray-500 text-sm mr-2">({doctor.review})</span>
+                      </div>
+                    )}
+
+                    {/* أزرار الحجز والمزيد */}
+                    <div className="flex justify-center items-center mt-6">
+
+
+                      <motion.button
+                        className={`bg-[#006272] hover:bg-[#008080] text-white px-6 py-2 rounded-lg font-medium transition duration-300`}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <Link to={`/booking?doctor=${doctor.id}`}>
+                          احجز الآن
+                        </Link>
+                      </motion.button>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
+
+
+
         </div>
       </section>
-
       {/* Appointment Section مع أنيميشن متميز */}
       <section className="py-20" style={{ backgroundColor: colors.primary }}>
         <div className="container mx-auto px-4">
@@ -543,9 +563,9 @@ function Home() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-           <Link to="/booking" className="block w-full h-full">
-                احجز موعد الآن
-              </Link>
+                <Link to="/booking" className="block w-full h-full">
+                  احجز موعد الآن
+                </Link>
               </motion.button>
             </motion.div>
             <motion.div

@@ -6,8 +6,105 @@ import { doc, collection, addDoc, getDocs, getDoc, deleteDoc, updateDoc, query, 
 import { useNavigate } from "react-router-dom";
 import useAuthStore from "../../store";
 import { getAuth } from "firebase/auth";
+import { FaCalendarAlt, FaClipboardList, FaCommentDots, FaUserCog, FaSignOutAlt } from "react-icons/fa";
+
 
 // مكون الشريط الجانبي
+// const Sidebar = ({ setPage, page }) => {
+//   const user = useAuthStore((state) => state.user);
+//   const doctorId = user.uid;
+//   const [doctorName, setDoctorName] = useState("...جاري التحميل");
+//   const [doctorImage, setDoctorImage] = useState("");
+
+//   useEffect(() => {
+//     const fetchDoctorData = async () => {
+//       if (!doctorId) return;
+//       try {
+//         const doctorRef = doc(db, "Doctors", doctorId);
+//         const docSnap = await getDoc(doctorRef);
+//         if (docSnap.exists()) {
+//           setDoctorName(docSnap.data().name);
+//           setDoctorImage(docSnap.data().profileImage);
+//         }
+//       } catch (error) {
+//         console.error("خطأ في جلب بيانات الطبيب:", error);
+//       }
+//     };
+//     fetchDoctorData();
+//   }, [doctorId]);
+
+//   return (
+//     <div className="flex flex-col bg-gray-900 text-white p-3 h-screen w-[250px] sticky top-0">
+//       <img
+//         src={doctorImage || "https://via.placeholder.com/150"}
+//         alt="Doctor"
+//         className="rounded-full mx-auto w-20 h-20 object-cover border-2 border-white"
+//       />
+//       <h4 className="text-center mt-2 text-lg font-semibold">{doctorName}</h4>
+//       <nav className="mt-6">
+//         <ul className="flex flex-col gap-2">
+//           <li>
+//             <button
+//               className={`w-full py-2 rounded transition ${page === "dashboard" ? "bg-[#09243c] text-white" : "bg-gray-700 hover:bg-gray-600"}`}
+//               onClick={() => setPage("dashboard")}
+//             >
+//               تحديد المواعيد
+//             </button>
+//           </li>
+//           <li>
+//             <button
+//               className={`w-full py-2 rounded transition ${page === "appointments" ? "bg-[#09243c] text-white" : "bg-gray-700 hover:bg-gray-600"}`}
+//               onClick={() => setPage("appointments")}
+//             >
+//               مواعيدي
+//             </button>
+//           </li>
+//           <li>
+//             <button
+//               className={`w-full py-2 rounded transition ${page === "BookingsPage" ? "bg-[#09243c] text-white" : "bg-gray-700 hover:bg-gray-600"}`}
+//               onClick={() => setPage("BookingsPage")}
+//             >
+//               حجوزاتي
+//             </button>
+//           </li>
+//           <li>
+//             <button
+//               className={`w-full py-2 rounded transition ${page === "chats" ? "bg-[#09243c] text-white" : "bg-gray-700 hover:bg-gray-600"}`}
+//               onClick={() => setPage("chats")}
+//             >
+//               المحادثات
+//             </button>
+//           </li>
+//           <li>
+//             <button
+//               className={`w-full py-2 rounded transition ${page === "DoctorProfile" ? "bg-[#09243c] text-white" : "bg-gray-700 hover:bg-gray-600"}`}
+//               onClick={() => setPage("DoctorProfile")}
+//             >
+//               إعدادات الحساب
+//             </button>
+//           </li>
+//         </ul>
+//         <li>
+//           <button
+//             onClick={async () => {
+//               try {
+//                 await auth.signOut();
+//                 window.location.href = "/signIn";
+//               } catch (error) {
+//                 console.error("فشل تسجيل الخروج:", error);
+//               }
+//             }}
+//             className="w-full py-2 rounded transition bg-red-600 hover:bg-red-700"
+//           >
+//             تسجيل الخروج
+//           </button>
+//         </li>
+
+//       </nav>
+//     </div>
+//   );
+// };
+
 const Sidebar = ({ setPage, page }) => {
   const user = useAuthStore((state) => state.user);
   const doctorId = user.uid;
@@ -32,7 +129,7 @@ const Sidebar = ({ setPage, page }) => {
   }, [doctorId]);
 
   return (
-    <div className="flex flex-col bg-gray-900 text-white p-3 h-screen w-[250px] sticky top-0">
+    <div className="flex flex-col bg-gradient-to-b from-[#09243c] to-[#006272] text-white p-3 h-screen w-[250px] sticky top-0">
       <img
         src={doctorImage || "https://via.placeholder.com/150"}
         alt="Doctor"
@@ -43,42 +140,42 @@ const Sidebar = ({ setPage, page }) => {
         <ul className="flex flex-col gap-2">
           <li>
             <button
-              className={`w-full py-2 rounded transition ${page === "dashboard" ? "bg-[#09243c] text-white" : "bg-gray-700 hover:bg-gray-600"}`}
+              className={`w-full py-2 rounded flex items-center gap-3 transition ${page === "dashboard" ? "bg-white/10 text-white" : " hover: bg-white/10"}` }
               onClick={() => setPage("dashboard")}
             >
-              تحديد المواعيد
+              <FaCalendarAlt /> <span>تحديد المواعيد</span>
             </button>
           </li>
           <li>
             <button
-              className={`w-full py-2 rounded transition ${page === "appointments" ? "bg-[#09243c] text-white" : "bg-gray-700 hover:bg-gray-600"}`}
+              className={`w-full py-2 rounded flex items-center gap-3 transition ${page === "appointments" ? "bg-white/10 text-white" : " hover:bg-white/10"}`}
               onClick={() => setPage("appointments")}
             >
-              مواعيدي
+              <FaClipboardList /> <span>مواعيدي</span>
             </button>
           </li>
           <li>
             <button
-              className={`w-full py-2 rounded transition ${page === "BookingsPage" ? "bg-[#09243c] text-white" : "bg-gray-700 hover:bg-gray-600"}`}
+              className={`w-full py-2 rounded flex items-center gap-3 transition ${page === "BookingsPage" ? "bg-white/10 text-white" : " hover:bg-white/10"}`}
               onClick={() => setPage("BookingsPage")}
             >
-              حجوزاتي
+              <FaClipboardList /> <span>حجوزاتي</span>
             </button>
           </li>
           <li>
             <button
-              className={`w-full py-2 rounded transition ${page === "chats" ? "bg-[#09243c] text-white" : "bg-gray-700 hover:bg-gray-600"}`}
+              className={`w-full py-2 rounded flex items-center gap-3 transition ${page === "chats" ? "bg-white/10 text-white" : " hover:bg-white/10"}`}
               onClick={() => setPage("chats")}
             >
-              المحادثات
+              <FaCommentDots /> <span>المحادثات</span>
             </button>
           </li>
           <li>
             <button
-              className={`w-full py-2 rounded transition ${page === "DoctorProfile" ? "bg-[#09243c] text-white" : "bg-gray-700 hover:bg-gray-600"}`}
+              className={`w-full py-2 rounded flex items-center gap-3 transition ${page === "DoctorProfile" ? "bg-white/10 text-white" : " hover:bg-white/10"}`}
               onClick={() => setPage("DoctorProfile")}
             >
-              إعدادات الحساب
+              <FaUserCog /> <span>إعدادات الحساب</span>
             </button>
           </li>
         </ul>
@@ -92,16 +189,25 @@ const Sidebar = ({ setPage, page }) => {
                 console.error("فشل تسجيل الخروج:", error);
               }
             }}
-            className="w-full py-2 rounded transition bg-red-600 hover:bg-red-700"
+            className="w-full py-2 rounded flex items-center gap-3 transition bg-red-600 hover:bg-red-700"
           >
-            تسجيل الخروج
+            <FaSignOutAlt /> <span>تسجيل الخروج</span>
           </button>
         </li>
-
       </nav>
     </div>
   );
 };
+
+
+
+
+
+
+
+
+
+
 
 // مكون صفحة المحادثات
 const ChatsPage = ({ doctorName }) => {
@@ -291,7 +397,7 @@ const DoctorDashboard = () => {
           <div className="pt-2">
             <button
               onClick={() => setShowCalendar(!showCalendar)}
-              className="w-full p-3 bg-[#09243c] hover:bg-[#0d2e4d] text-white rounded-lg transition"
+              className="w-full p-3 bg-[#0a5372] hover:bg-[#0d2e4d] text-white rounded-lg transition"
             >
               {showCalendar ? "إخفاء التقويم" : "حدد تاريخ الموعد"}
             </button>
@@ -409,7 +515,7 @@ const AppointmentsPage = () => {
                 </div>
                 <div className="flex gap-2">
                   <button
-                    className="bg-[#09243c] hover:bg-[#0d2e4d] text-white px-4 py-2 rounded-lg transition"
+                    className="bg-[#0a5372] hover:bg-[#0d2e4d] text-white px-4 py-2 rounded-lg transition"
                     onClick={() => handleEdit(appointment.id)}
                   >
                     تعديل
@@ -662,7 +768,7 @@ const DoctorProfile = () => {
 
             <button
               onClick={() => setEditing(true)}
-              className="mt-6 w-full bg-[#09243c] hover:bg-[#0d2e4d] text-white py-3 px-4 rounded-lg transition"
+              className="mt-6 w-full bg-[#0a5372] hover:bg-[#0d2e4d] text-white py-3 px-4 rounded-lg transition"
             >
               تعديل البيانات
             </button>

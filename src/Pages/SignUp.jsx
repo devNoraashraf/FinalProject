@@ -1,10 +1,9 @@
-
-
-import React, { useState } from "react";
+import React, { useState , useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth, db } from "../../firebase-config";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import { motion } from "framer-motion";
 import img from "../assets/s.jpg";
 import userAvatar from "../assets/avatar.png";
@@ -26,6 +25,8 @@ const UNIFIED_SPECIALTIES = [
   "نساء وتوليد"
 ];
 
+
+
 const SignUp = () => {
   const [tab, setTab] = useState("user");
   const [email, setEmail] = useState("");
@@ -36,10 +37,29 @@ const SignUp = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
+  const [price, setPrice] = useState("");
+  const [governorate, setGovernorate] = useState("");
+  const [governorates, setGovernorates] = useState([]);
+
+
   const defaultImages = {
     user: userAvatar,
     doctor: doctorAvatar,
   };
+
+  useEffect(() => {
+    const fetchGovernorates = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "country"));
+        const governoratesList = querySnapshot.docs.map(doc => doc.data().name);
+        setGovernorates(governoratesList);
+      } catch (error) {
+        console.error("Error fetching governorates:", error);
+      }
+    };
+
+    fetchGovernorates();
+  }, []);
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -65,6 +85,11 @@ const SignUp = () => {
       if (tab === "doctor") {
         if (!specialty) {
           throw new Error("يجب تحديد التخصص");
+        } if (!price) {
+          throw new Error("يجب تحديد سعر الكشف");
+        }
+        if (!governorate) {
+          throw new Error("يجب تحديد المحافظة");
         }
         
         // التحقق من أن التخصص موجود في القائمة الموحدة
@@ -77,6 +102,8 @@ const SignUp = () => {
         }
 
         userData.specialty = normalizedSpecialty;
+        userData.price = Number(price);
+        userData.governorate = governorate;
         
         console.log("Registering doctor with data:", userData);
         await setDoc(doc(db, "Doctors", user.uid), userData);
@@ -209,18 +236,47 @@ const SignUp = () => {
 
             {tab === "doctor" && (
               <div>
-                <label className="block text-gray-700 font-medium mb-2">التخصص</label>
-                <select
-                  value={specialty}
-                  onChange={(e) => setSpecialty(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#008080] focus:border-transparent transition duration-300"
-                  required
-                >
-                  <option value="">اختر التخصص</option>
-                  {UNIFIED_SPECIALTIES.map((spec) => (
-                    <option key={spec} value={spec}>{spec}</option>
-                  ))}
-                </select>
+                <div>
+                  <label className="block text-gray-700 font-medium mb-2">التخصص</label>
+                  <select
+                    value={specialty}
+                    onChange={(e) => setSpecialty(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#008080] focus:border-transparent transition duration-300"
+                    required
+                  >
+                    <option value="">اختر التخصص</option>
+                    {UNIFIED_SPECIALTIES.map((spec) => (
+                      <option key={spec} value={spec}>{spec}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-gray-700 font-medium mb-2">سعر الكشف</label>
+                  <input
+                    type="number"
+                    value={price}
+                    onChange={(e) => setPrice(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#008080] focus:border-transparent transition duration-300"
+                    placeholder="أدخل سعر الكشف"
+                    required
+                    min="0"
+                  />
+                </div>
+            
+                <div>
+                  <label className="block text-gray-700 font-medium mb-2">المحافظة</label>
+                  <select
+                    value={governorate}
+                    onChange={(e) => setGovernorate(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#008080] focus:border-transparent transition duration-300"
+                    required
+                  >
+                    <option value="">اختر المحافظة</option>
+                    {governorates.map((gov) => (
+                      <option key={gov} value={gov}>{gov}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
             )}
 

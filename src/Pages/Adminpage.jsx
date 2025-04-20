@@ -75,10 +75,11 @@ const useDashboardStore = create((set) => ({
   
 }));
 
+// Add these state variables at the beginning of the Adminpage component
 const Adminpage = () => {
-  // Add new state for specialty filter
   const [specialtyFilter, setSpecialtyFilter] = useState('all');
-  
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
 
   const { doctors, users, chats, medicines, appointments, fetchData, removeItem, userData, updateUserData } = useDashboardStore();
   const [activeSection, setActiveSection] = useState('dashboard');
@@ -132,6 +133,10 @@ const Adminpage = () => {
     setEditData(userData);
   }, [userData]);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeSection]);
+
   const handleUpdateUser = async () => {
     await updateUserData(editData);
     alert('تم تحديث البيانات بنجاح!');
@@ -180,10 +185,10 @@ const Adminpage = () => {
   
   const renderMedicines = (medicines) => (
     <div className="space-y-4">
-      <div className="flex justify-end mb-4">
+      <div className="flex justify-start mb-4">
         <button
           onClick={() => setIsAddingMedicine(true)}
-          className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-green-600 transition-colors"
+          className="px-4 py-2 bg-[#0a5372] text-white rounded-md hover:bg-green-600 transition-colors"
         >
           ➕ إضافة دواء جديد
         </button>
@@ -267,7 +272,7 @@ const Adminpage = () => {
           <div className="flex justify-between mt-4 gap-2">
             <button
               onClick={() => editMedicine(medicine)}
-              className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+              className="flex-1 px-4 py-2 bg-[#0a5372] text-white rounded-md hover:bg-blue-600 transition-colors"
             >
               تعديل
             </button>
@@ -403,11 +408,40 @@ const Adminpage = () => {
       }
 
 
+// First, add the Pagination component after the Modal component
+const Pagination = ({ totalItems, currentPage, onPageChange }) => {
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  
+  return (
+    <div className="flex justify-center gap-2 mt-4">
+      {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+        <button
+          key={page}
+          onClick={() => onPageChange(page)}
+          className={`px-4 py-2 rounded ${
+            currentPage === page
+              ? 'bg-[#0a5372] text-white'
+              : 'bg-gray-200 hover:bg-gray-300'
+          }`}
+        >
+          {page}
+        </button>
+      ))}
+    </div>
+  );
+};
+
+// Update the doctors section
 if (activeSection === 'doctors') {
   const specialties = ['all', ...new Set(doctors.map(doc => doc.specialty))];
   const filteredDoctors = specialtyFilter === 'all' 
     ? doctors 
     : doctors.filter(doc => doc.specialty === specialtyFilter);
+
+  // Add pagination calculation
+  const indexOfLastDoctor = currentPage * itemsPerPage;
+  const indexOfFirstDoctor = indexOfLastDoctor - itemsPerPage;
+  const currentDoctors = filteredDoctors.slice(indexOfFirstDoctor, indexOfLastDoctor);
 
   return (
     <div className="space-y-4">
@@ -418,7 +452,7 @@ if (activeSection === 'doctors') {
             onClick={() => setSpecialtyFilter(specialty)}
             className={`px-4 py-2 rounded-full transition-colors ${
               specialtyFilter === specialty
-                ? 'bg-blue-600 text-white'
+                ? 'bg-[#0a5372] text-white'
                 : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
             }`}
           >
@@ -434,80 +468,104 @@ if (activeSection === 'doctors') {
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">الاسم</th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">التخصص</th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">البريد الإلكتروني</th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">رقم الهاتف</th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">الإجراءات</th>
+              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">سعر الكشف</th>
+              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
+
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {filteredDoctors.map(doctor => (
+            {currentDoctors.map(doctor => (
               <tr key={doctor.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap text-right">{doctor.name}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-right">{doctor.specialty}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-right">{doctor.email}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-right">{doctor.phone}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-right space-x-2">
-                  <button 
-                    className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600" 
-                    onClick={() => setSelectedItem(doctor)}
-                  >
-                    التفاصيل
-                  </button>
-                  <button 
-                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600" 
-                    onClick={() => removeItem('doctors', doctor.id)}
-                  >
-                    حذف
-                  </button>
-                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-right">{doctor.price}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-right">
+  <div className="flex justify-end gap-2">
+    <button 
+      className="bg-[#0a5372] text-white px-3 py-1 rounded hover:bg-blue-600" 
+      onClick={() => setSelectedItem(doctor)}
+    >
+      التفاصيل
+    </button>
+    <button 
+      className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600" 
+      onClick={() => removeItem('doctors', doctor.id)}
+    >
+      حذف
+    </button>
+  </div>
+</td>
+
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      <Pagination 
+        totalItems={filteredDoctors.length}
+        currentPage={currentPage}
+        onPageChange={setCurrentPage}
+      />
     </div>
   );
 }
 
+// Update the users section
 if (activeSection === 'users') {
+  // Add pagination calculation
+  const indexOfLastUser = currentPage * itemsPerPage;
+  const indexOfFirstUser = indexOfLastUser - itemsPerPage;
+  const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
+
   return (
-    <div className="bg-white rounded-lg shadow overflow-hidden">
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
-          <tr>
-            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">الاسم</th>
-            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">البريد الإلكتروني</th>
-            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">رقم الهاتف</th>
-            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">تاريخ التسجيل</th>
-            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">الإجراءات</th>
-          </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-          {users.map(user => (
-            <tr key={user.id} className="hover:bg-gray-50">
-              <td className="px-6 py-4 whitespace-nowrap text-right">{user.name}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-right">{user.email}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-right">{user.phone}</td>
-              <td className="px-6 py-4 whitespace-nowrap text-right">
-                {new Date(user.createdAt?.seconds * 1000).toLocaleDateString()}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-right space-x-2">
-                <button 
-                  className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600" 
-                  onClick={() => setSelectedItem(user)}
-                >
-                  التفاصيل
-                </button>
-                <button 
-                  className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600" 
-                  onClick={() => removeItem('users', user.id)}
-                >
-                  حذف
-                </button>
-              </td>
+    <div>
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">الاسم</th>
+              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">البريد الإلكتروني</th>
+              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">رقم الهاتف</th>
+              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"> </th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {currentUsers.map(user => (
+              <tr key={user.id} className="hover:bg-gray-50">
+                <td className="px-6 py-4 whitespace-nowrap text-right">{user.name}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-right">{user.email}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-right">{user.phone}</td>
+
+                <td className="px-6 py-4 whitespace-nowrap text-right">
+  <div className="flex justify-end gap-2">
+    <button 
+      className="bg-[#0a5372] text-white px-3 py-1 rounded hover:bg-blue-600" 
+      onClick={() => setSelectedItem(user)}
+    >
+      التفاصيل
+    </button>
+    <button 
+      className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600" 
+      onClick={() => removeItem('users', user.id)}
+    >
+      حذف
+    </button>
+  </div>
+</td>
+
             </tr>
           ))}
         </tbody>
       </table>
+    </div>
+
+      <Pagination 
+        totalItems={users.length}
+        currentPage={currentPage}
+        onPageChange={setCurrentPage}
+      />
     </div>
   );
 }

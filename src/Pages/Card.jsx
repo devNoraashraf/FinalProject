@@ -31,7 +31,7 @@ function Card() {
 
     return (
         <div className="bg-gray-100 py-8 px-4">
-            <h2 className="text-2xl font-semibold text-right mb-6 pr-32">ابحث بالقسم</h2>
+            <h2 className="text-2xl font-semibold text-right mb-6 pr-32 text-[#006272]">ابحث بالقسم</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 justify-center px-10">
                 {categories.map((category, index) => (
                     <div key={index} className="bg-white rounded-lg shadow-md p-4 flex flex-col items-center transition-transform transform hover:scale-105 hover:text-[#008080] cursor-pointer group overflow-hidden"

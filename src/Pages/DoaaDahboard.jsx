@@ -9,101 +9,6 @@ import { getAuth } from "firebase/auth";
 import { FaCalendarAlt, FaClipboardList, FaCommentDots, FaUserCog, FaSignOutAlt } from "react-icons/fa";
 
 
-// مكون الشريط الجانبي
-// const Sidebar = ({ setPage, page }) => {
-//   const user = useAuthStore((state) => state.user);
-//   const doctorId = user.uid;
-//   const [doctorName, setDoctorName] = useState("...جاري التحميل");
-//   const [doctorImage, setDoctorImage] = useState("");
-
-//   useEffect(() => {
-//     const fetchDoctorData = async () => {
-//       if (!doctorId) return;
-//       try {
-//         const doctorRef = doc(db, "Doctors", doctorId);
-//         const docSnap = await getDoc(doctorRef);
-//         if (docSnap.exists()) {
-//           setDoctorName(docSnap.data().name);
-//           setDoctorImage(docSnap.data().profileImage);
-//         }
-//       } catch (error) {
-//         console.error("خطأ في جلب بيانات الطبيب:", error);
-//       }
-//     };
-//     fetchDoctorData();
-//   }, [doctorId]);
-
-//   return (
-//     <div className="flex flex-col bg-gray-900 text-white p-3 h-screen w-[250px] sticky top-0">
-//       <img
-//         src={doctorImage || "https://via.placeholder.com/150"}
-//         alt="Doctor"
-//         className="rounded-full mx-auto w-20 h-20 object-cover border-2 border-white"
-//       />
-//       <h4 className="text-center mt-2 text-lg font-semibold">{doctorName}</h4>
-//       <nav className="mt-6">
-//         <ul className="flex flex-col gap-2">
-//           <li>
-//             <button
-//               className={`w-full py-2 rounded transition ${page === "dashboard" ? "bg-[#09243c] text-white" : "bg-gray-700 hover:bg-gray-600"}`}
-//               onClick={() => setPage("dashboard")}
-//             >
-//               تحديد المواعيد
-//             </button>
-//           </li>
-//           <li>
-//             <button
-//               className={`w-full py-2 rounded transition ${page === "appointments" ? "bg-[#09243c] text-white" : "bg-gray-700 hover:bg-gray-600"}`}
-//               onClick={() => setPage("appointments")}
-//             >
-//               مواعيدي
-//             </button>
-//           </li>
-//           <li>
-//             <button
-//               className={`w-full py-2 rounded transition ${page === "BookingsPage" ? "bg-[#09243c] text-white" : "bg-gray-700 hover:bg-gray-600"}`}
-//               onClick={() => setPage("BookingsPage")}
-//             >
-//               حجوزاتي
-//             </button>
-//           </li>
-//           <li>
-//             <button
-//               className={`w-full py-2 rounded transition ${page === "chats" ? "bg-[#09243c] text-white" : "bg-gray-700 hover:bg-gray-600"}`}
-//               onClick={() => setPage("chats")}
-//             >
-//               المحادثات
-//             </button>
-//           </li>
-//           <li>
-//             <button
-//               className={`w-full py-2 rounded transition ${page === "DoctorProfile" ? "bg-[#09243c] text-white" : "bg-gray-700 hover:bg-gray-600"}`}
-//               onClick={() => setPage("DoctorProfile")}
-//             >
-//               إعدادات الحساب
-//             </button>
-//           </li>
-//         </ul>
-//         <li>
-//           <button
-//             onClick={async () => {
-//               try {
-//                 await auth.signOut();
-//                 window.location.href = "/signIn";
-//               } catch (error) {
-//                 console.error("فشل تسجيل الخروج:", error);
-//               }
-//             }}
-//             className="w-full py-2 rounded transition bg-red-600 hover:bg-red-700"
-//           >
-//             تسجيل الخروج
-//           </button>
-//         </li>
-
-//       </nav>
-//     </div>
-//   );
-// };
 
 const Sidebar = ({ setPage, page }) => {
   const user = useAuthStore((state) => state.user);
@@ -624,6 +529,9 @@ const BookingsPage = () => {
     </div>
   );
 };
+
+
+
 
 // مكون صفحة الملف الشخصي
 const DoctorProfile = () => {

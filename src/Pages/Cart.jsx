@@ -36,11 +36,8 @@ const Cart = () => {
     const decreaseQuantity = (id) => {
         setCart(prevCart => {
             const updatedCart = prevCart
-                .map(item =>
-                    item.id === id ? { ...item, quantity: item.quantity - 1 } : item
-                )
+                .map(item => item.id === id ? { ...item, quantity: item.quantity - 1 } : item)
                 .filter(item => item.quantity > 0);
-
             updateCartInFirestore(updatedCart);
             return updatedCart;
         });
@@ -51,7 +48,6 @@ const Cart = () => {
             const updatedCart = prevCart.map(item =>
                 item.id === id ? { ...item, quantity: item.quantity + 1 } : item
             );
-
             updateCartInFirestore(updatedCart);
             return updatedCart;
         });
@@ -70,61 +66,80 @@ const Cart = () => {
     };
 
     const handleCheckout = () => {
-        // توجيه المستخدم إلى صفحة الدفع
         navigate('/checkout');
     };
 
     if (loading) {
-        return <p className="text-center">جاري تحميل السلة...</p>;
+        return <p className="text-center text-gray-500 mt-10">جارٍ تحميل السلة...</p>;
     }
 
     return (
-        <div className="px-10 mt-5 mb-5">
-            {/* محتوى السلة */}
-            {cart.length === 0 ? (
-                <p className="text-center text-[#006272]">السلة فارغة</p>
-            ) : (
-                <div className="space-y-6">
-                    {/* عرض الأدوية */}
-                    {cart.map(item => (
-                        <div key={item.id} className="flex justify-between items-center bg-white p-2 rounded-lg shadow-md">
-                            <div className="flex items-center gap-4">
-                                <img src={item.img} alt={item.title} className="w-24 h-24 object-cover rounded-lg shadow-md" />
-                                <div>
-                                    <h4 className="text-xl font-semibold text-[#006272]">{item.title}</h4>
-                                    <p className="text-[#006272]">{item.type}</p>
-                                    <p className="text-[#006272]">السعر: {item.price} جنيه</p>
+        <div className="bg-gradient-to-b from-blue-50 to-white min-h-screen">
+            <div className="max-w-5xl mx-auto px-4 py-6">
+                <h2 className="text-2xl font-bold text-[#006272] mb-6 text-center">🛒 سلة المشتريات</h2>
+    
+                {cart.length === 0 ? (
+                    <p className="text-center text-gray-500">السلة فارغة</p>
+                ) : (
+                    <div className="space-y-6">
+                        {cart.map(item => (
+                            <div
+                                key={item.id}
+                                className="bg-white shadow-md rounded-lg p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4 hover:shadow-lg transition"
+                            >
+                                {/* صورة ومعلومات الدواء */}
+                                <div className="flex items-center gap-4">
+                                    <img
+                                        src={item.img}
+                                        alt={item.title}
+                                        className="w-20 h-20 object-cover rounded-md"
+                                    />
+                                    <div>
+                                        <h4 className="text-lg font-semibold text-[#004D4D]">{item.title}</h4>
+                                        <p className="text-sm text-gray-600">{item.type}</p>
+                                        <p className="text-sm text-gray-700 mt-1">السعر: {item.price} جنيه</p>
+                                    </div>
+                                </div>
+    
+                                {/* الكمية + الإجمالي + الحذف */}
+                                <div className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6 w-full md:w-auto">
+                                    <div className="flex items-center gap-3">
+                                        <button onClick={() => decreaseQuantity(item.id)} className="bg-gray-200 text-gray-700 px-2 rounded hover:bg-gray-300">-</button>
+                                        <span className="text-lg font-bold text-[#006272]">{item.quantity}</span>
+                                        <button onClick={() => increaseQuantity(item.id)} className="bg-gray-200 text-gray-700 px-2 rounded hover:bg-gray-300">+</button>
+                                    </div>
+                                    <div className="text-sm font-semibold text-[#004D4D] whitespace-nowrap">
+                                        الإجمالي: {item.price * item.quantity} جنيه
+                                    </div>
+                                    <button
+                                        onClick={() => removeFromCart(item.id)}
+                                        className="text-red-500 hover:text-red-700 text-xl"
+                                    >
+                                        &times;
+                                    </button>
                                 </div>
                             </div>
-
-                            <div className="flex items-center gap-3">
-                                <button onClick={() => decreaseQuantity(item.id)} className="text-white px-2 py-1 rounded-lg shadow-md">➖</button>
-                                <span className="text-lg font-semibold text-[#006272]">{item.quantity}</span>
-                                <button onClick={() => increaseQuantity(item.id)} className="text-white px-2 py-1 rounded-lg shadow-md">➕</button>
-                                <button onClick={() => removeFromCart(item.id)} className="bg-red-600 text-white px-2 py-1 rounded-lg shadow-md">❌</button>
-                            </div>
-
-                            <div className="text-[#006272] font-semibold">
-                                إجمالي السعر: {item.price * item.quantity} جنيه
-                            </div>
+                        ))}
+    
+                        <div className="mt-6 text-right">
+                            <h3 className="text-xl font-bold text-[#006272]">
+                                💰 إجمالي السعر: {calculateTotal()} جنيه
+                            </h3>
                         </div>
-                    ))}
-
-                    {/* إجمالي السعر */}
-                    <div className="mt-5 text-right">
-                        <h3 className="text-lg font-semibold text-[#006272]">إجمالي السعر: {calculateTotal()} جنيه</h3>
+    
+                        <div className="flex justify-end">
+                            <button
+                                onClick={handleCheckout}
+                                className="bg-[#006272] text-white px-6 py-3 rounded-lg shadow-md hover:bg-[#008080] transition text-lg">
+                                تأكيد الشراء
+                            </button>
+                        </div>
                     </div>
-
-                    {/* زر تأكيد الشراء */}
-                    <div className="mt-5 flex justify-end">
-                        <button onClick={handleCheckout} className="bg-[#006272] text-white px-6 py-2 text-lg rounded-lg shadow-lg hover:bg-[#008080] transition">
-                            تأكيد الشراء
-                        </button>
-                    </div>
-                </div>
-            )}
+                )}
+            </div>
         </div>
     );
+    
 };
 
 export default Cart;

@@ -30,7 +30,7 @@ function Card() {
     ];
 
     return (
-        <div className="bg-gray-100 py-8 px-4">
+        <div className="bg-gradient-to-b from-blue-50 to-white py-8 px-4">
             <h2 className="text-2xl font-semibold text-right mb-6 pr-32 text-[#006272]">ابحث بالقسم</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 justify-center px-10">
                 {categories.map((category, index) => (

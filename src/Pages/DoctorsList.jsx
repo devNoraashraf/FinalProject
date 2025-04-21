@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { FaSearch } from "react-icons/fa";
 import { useLocation } from "react-router-dom"; // ✅ تمت إضافته
 
+import { FaUserMd, FaStethoscope, FaMapMarkerAlt, FaMoneyBillWave, FaStar } from "react-icons/fa";
 
 import BookingPage from "./Bookingpage";
 import Modal from "react-modal";
@@ -204,64 +205,79 @@ const DoctorsList = () => {
     </div>
   
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full max-w-6xl">
-      {filteredDoctors.length === 0 ? (
-        <div className="text-center text-lg font-semibold text-gray-600">لا توجد نتائج لعرضها.</div>
-      ) : (
-        filteredDoctors.map((doctor) => (
-          <motion.div 
-            key={doctor.id} 
-            className="bg-white p-4 rounded-lg shadow-lg text-center cursor-pointer transition-colors hover:bg-[#193849] hover:text-white"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            whileHover={{ scale: 1.05 }}
-            transition={{ duration: 0.5 }}
-          >
-            <img src={doctor.image || "https://png.pngtree.com/thumb_back/fh260/background/20220313/pngtree-doctor-man-with-stethoscope-in-hospital-image_1059265.jpg"} alt={doctor.name} className="w-full h-48 object-cover rounded-lg mb-4" />
-            <h2 className="text-xl font-bold">{doctor.name}</h2>
-            <p><strong>التخصص:</strong> {doctor.specialty}</p>
-            <p><strong>المحافظة:</strong> {doctor.governorate}</p>
-            <p><strong>السعر:</strong> {doctor.price} جنيه</p>
-            <p><strong>التقييم:</strong> ⭐ {doctor.review}/5</p>
+  {filteredDoctors.length === 0 ? (
+    <div className="text-center text-lg font-semibold text-gray-600">لا توجد نتائج لعرضها.</div>
+  ) : (
+    filteredDoctors.map((doctor) => (
 
-
-
-
-<button
-        onClick={() => handleBooking(doctor.id)}
-        className="mt-4 bg-[#193849] text-white px-4 py-2 rounded-lg transition-colors duration-300 hover:bg-white hover:text-[#08473a]"
+      <motion.div 
+        key={doctor.id} 
+        className="bg-white p-4 rounded-lg shadow-lg text-right cursor-pointer transition-colors hover:bg-[#193849] group font-[Tajawal]"
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        whileHover={{ scale: 1.05 }}
+        transition={{ duration: 0.5 }}
       >
-        احجز الموعد
-      </button>
+        <img 
+          src={doctor.image || "https://png.pngtree.com/thumb_back/fh260/background/20220313/pngtree-doctor-man-with-stethoscope-in-hospital-image_1059265.jpg"} 
+          alt={doctor.name} 
+          className="w-full h-48 object-cover rounded-lg mb-4" 
+        />
 
-      {/* نافذة المودال */}
-      <Modal
-  isOpen={isOpen}
-  onRequestClose={() => setIsOpen(false)}
-  className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 w-[90%] max-w-lg"
-  overlayClassName="fixed inset-0"
->
-  <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-300 text-center relative">
-    <h2 className="text-xl font-bold mb-4 text-gray-800">حجز الموعد</h2>
-    
-    <BookingPage doctorId={selectedDoctorId}  closeModal={() => setIsOpen(false)} />    
-    <button
-      className="mt-4 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition duration-300"
-      onClick={() => setIsOpen(false)}
-    >
-      إغلاق
-    </button>
-  </div>
-</Modal>
+        <h2 className="text-xl font-bold mb-2 flex items-center gap-2 group-hover:text-white transition-colors duration-300">
+          <span className="text-[#4acbbf] bg-[#1e9086] p-2 rounded-full"><FaUserMd /></span> {doctor.name}
+        </h2>
 
+        <div className="text-lg text-gray-700 space-y-2 group-hover:text-white transition-colors duration-300">
+          <div className="flex items-center gap-3">
+            <span className="text-[#4acbbf] bg-[#1e9086] p-2 rounded-full"><FaStethoscope /></span> {doctor.specialty}
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-[#4acbbf] bg-[#1e9086] p-2 rounded-full"><FaMapMarkerAlt /></span> {doctor.governorate}
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-[#4acbbf] bg-[#1e9086] p-2 rounded-full"><FaMoneyBillWave /></span> {doctor.price} جنيه
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-[#facc15] bg-[#c29d07] p-2 rounded-full"><FaStar /></span> {doctor.review} / 5
+          </div>
+        </div>
 
+        <div className="flex justify-center mt-4">
+          <button
+            onClick={() => handleBooking(doctor.id)}
+            className="mt-4 bg-[#193849] text-white px-4 py-2 rounded-lg transition-colors duration-300 hover:bg-white hover:text-[#08473a]"
+          >
+            احجز الموعد
+          </button>
+        </div> {/* ✅ تم إغلاق الـ div الناقص هنا */}
 
+        {/* نافذة المودال */}
+        <Modal
+          isOpen={isOpen}
+          onRequestClose={() => setIsOpen(false)}
+          className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 w-[90%] max-w-lg"
+          overlayClassName="fixed inset-0"
+        >
+          <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-300 text-center relative">
+            <h2 className="text-xl font-bold mb-4 text-gray-800">حجز الموعد</h2>
 
+            <BookingPage doctorId={selectedDoctorId} closeModal={() => setIsOpen(false)} />
 
+            <button
+              className="mt-4 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition duration-300"
+              onClick={() => setIsOpen(false)}
+            >
+              إغلاق
+            </button>
+          </div>
+        </Modal>
+      </motion.div>
 
-          </motion.div>
-        ))
-      )}
-    </div>
+    ))
+  )}
+</div>
+
   </div>
   );
 };

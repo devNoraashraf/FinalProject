@@ -2,12 +2,14 @@ import React, { useState, useEffect } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import { auth, db } from "../../firebase-config";
-import { doc, collection, addDoc, getDocs, getDoc, deleteDoc, updateDoc, query, where, onSnapshot } from "firebase/firestore";
+import { doc, collection, addDoc, getDocs,setDoc, getDoc, deleteDoc, updateDoc, query, where, onSnapshot } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import useAuthStore from "../../store";
 import { getAuth } from "firebase/auth";
 import { FaCalendarAlt, FaClipboardList, FaCommentDots, FaUserCog, FaSignOutAlt } from "react-icons/fa";
+import Modal from 'react-modal'; // أو استخدمي مكون خاص
 
+Modal.setAppElement('#root'); // مهم لو بتستخدمي React Modal
 
 
 const Sidebar = ({ setPage, page }) => {
@@ -223,313 +225,496 @@ const ChatsPage = ({ doctorName }) => {
 const DoctorDashboard = () => {
   const user = useAuthStore((state) => state.user);
   const doctorId = user.uid;
+  
   const [showCalendar, setShowCalendar] = useState(false);
   const [date, setDate] = useState(new Date());
   const [appointments, setAppointments] = useState([]);
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   useEffect(() => {
     const fetchAppointments = async () => {
       if (!doctorId) return;
-      setLoading(true);
       const doctorRef = doc(db, "Doctors", doctorId);
       const appointmentsRef = collection(doctorRef, "appointments");
       const snapshot = await getDocs(appointmentsRef);
       setAppointments(snapshot.docs.map((doc) => doc.data()));
-      setLoading(false);
     };
     fetchAppointments();
   }, [doctorId]);
 
-  const handleDateChange = async (selectedDate) => {
+  const handleDateChange = (selectedDate) => {
+    if (!startTime || !endTime) {
+      alert("يرجى إدخال وقت البداية والنهاية قبل تحديد التاريخ.");
+      return;
+    }
     setDate(selectedDate);
-    const formattedDate = selectedDate.toLocaleDateString("en-CA");
+    setShowConfirmModal(true);
+    setShowCalendar(false);
+  };
+
+  const handleConfirmAdd = async () => {
+    const formattedDate = date.toLocaleDateString("en-CA");
 
     try {
-      if (!doctorId || !startTime || !endTime) {
-        alert("يرجى إدخال أوقات العمل قبل تحديد الموعد.");
-        return;
-      }
-
-      setLoading(true);
       const doctorRef = doc(db, "Doctors", doctorId);
       const appointmentsRef = collection(doctorRef, "appointments");
-      await addDoc(appointmentsRef, {
-        date: formattedDate,
-        startTime,
-        endTime,
-        isBooked: false
-      });
-
+      await addDoc(appointmentsRef, { date: formattedDate, startTime, endTime, isBooked: false });
       setAppointments([...appointments, { date: formattedDate, startTime, endTime, isBooked: false }]);
-      setLoading(false);
-      alert("تم إضافة الموعد بنجاح!");
+      setShowConfirmModal(false);
     } catch (error) {
       console.error("خطأ في إضافة الموعد:", error);
-      setLoading(false);
     }
-    setShowCalendar(false);
   };
 
   return (
     <div className="flex justify-center mt-10">
-      <div className="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">تحديد المواعيد</h2>
+      <div className="bg-white p-6 rounded-2xl shadow-xl w-[500px] text-center">
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">حدد مواعيدك</h2>
 
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 gap-4 mb-4">
+          {/* وقت البداية */}
           <div>
             <label className="block text-gray-600 font-medium mb-1">وقت البداية</label>
             <input
               type="time"
               value={startTime}
               onChange={(e) => setStartTime(e.target.value)}
-              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#09243c] focus:border-transparent"
+              className="w-full px-4 py-2 border-2 border-gray-300 rounded-xl shadow-inner focus:outline-none focus:ring-2 focus:ring-[#4acbbf]"
             />
           </div>
 
+          {/* وقت النهاية */}
           <div>
             <label className="block text-gray-600 font-medium mb-1">وقت النهاية</label>
             <input
               type="time"
               value={endTime}
               onChange={(e) => setEndTime(e.target.value)}
-              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#09243c] focus:border-transparent"
+              className="w-full px-4 py-2 border-2 border-gray-300 rounded-xl shadow-inner focus:outline-none focus:ring-2 focus:ring-[#4acbbf]"
             />
           </div>
 
-          <div className="pt-2">
+          {/* زر تحديد التاريخ */}
+          <div>
             <button
               onClick={() => setShowCalendar(!showCalendar)}
-              className="w-full p-3 bg-[#0a5372] hover:bg-[#0d2e4d] text-white rounded-lg transition"
+              className="w-full py-2 bg-[#0a5372] hover:bg-[#0d2e4d] text-white font-medium rounded-xl transition-all duration-200"
             >
-              {showCalendar ? "إخفاء التقويم" : "حدد تاريخ الموعد"}
+              {showCalendar ? "إخفاء التاريخ" : "ادخل التاريخ"}
             </button>
           </div>
 
+          {/* الكاليندر */}
           {showCalendar && (
-            <div className="mt-4">
+            <div className="flex justify-center">
               <Calendar
                 onChange={handleDateChange}
                 value={date}
-                minDate={new Date()}
-                className="w-full border rounded-lg p-2 shadow-sm mx-auto"
+                className="border rounded-xl p-2 shadow-sm"
               />
             </div>
           )}
         </div>
 
-        {loading && (
-          <div className="mt-4 text-center">
-            <p className="text-gray-500">جاري حفظ البيانات...</p>
+        {/* مودال تأكيد الموعد */}
+        <Modal
+          isOpen={showConfirmModal}
+          onRequestClose={() => setShowConfirmModal(false)}
+          className="bg-white p-6 rounded-2xl shadow-xl w-[90%] max-w-lg mx-auto text-center"
+          overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+        >
+          <h3 className="text-xl font-bold text-gray-800 mb-4">تأكيد إضافة الموعد</h3>
+          <p className="text-gray-600 mb-6 leading-relaxed">
+            سيتم إضافة الموعد التالي:
+            <br />
+            <span className="font-semibold text-[#09243c]">
+              {date.toLocaleDateString()} من {startTime} إلى {endTime}
+            </span>
+          </p>
+          <div className="flex justify-center gap-4">
+            <button
+              className="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-lg transition"
+              onClick={() => setShowConfirmModal(false)}
+            >
+              إلغاء
+            </button>
+            <button
+              className="px-4 py-2 bg-[#4acbbf] hover:bg-[#3ab0a7] text-white font-semibold rounded-lg transition"
+              onClick={handleConfirmAdd}
+            >
+              تأكيد
+            </button>
           </div>
-        )}
+        </Modal>
       </div>
     </div>
   );
 };
-
 // مكون صفحة المواعيد
 const AppointmentsPage = () => {
   const user = useAuthStore((state) => state.user);
-  const doctorId = user.uid;
+  const doctorId = user?.uid;
+
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [editId, setEditId] = useState(null);
+  const [editData, setEditData] = useState({ date: "", startTime: "", endTime: "" });
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 
   useEffect(() => {
-    const fetchAppointments = async () => {
-      if (!doctorId) return;
-      setLoading(true);
+    if (doctorId) fetchAppointments();
+  }, [doctorId]);
+
+  const fetchAppointments = async () => {
+    setLoading(true);
+    try {
       const doctorRef = doc(db, "Doctors", doctorId);
       const appointmentsRef = collection(doctorRef, "appointments");
       const snapshot = await getDocs(appointmentsRef);
       setAppointments(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+    } catch (error) {
+      console.error("فشل تحميل المواعيد:", error);
+    } finally {
       setLoading(false);
-    };
-    fetchAppointments();
-  }, [doctorId]);
-
-  const handleDelete = async (appointmentId) => {
-    if (window.confirm("هل أنت متأكد من حذف هذا الموعد؟")) {
-      try {
-        const doctorRef = doc(db, "Doctors", doctorId);
-        const appointmentDoc = doc(doctorRef, "appointments", appointmentId);
-        await deleteDoc(appointmentDoc);
-        setAppointments(appointments.filter((appointment) => appointment.id !== appointmentId));
-        alert("تم حذف الموعد بنجاح!");
-      } catch (error) {
-        console.error("خطأ في حذف الموعد:", error);
-      }
     }
   };
 
-  const handleEdit = async (appointmentId) => {
-    const appointment = appointments.find(a => a.id === appointmentId);
-    const newDate = prompt("أدخل التاريخ الجديد (YYYY-MM-DD):", appointment.date);
-    const newStartTime = prompt("أدخل وقت البداية الجديد (HH:MM):", appointment.startTime);
-    const newEndTime = prompt("أدخل وقت النهاية الجديد (HH:MM):", appointment.endTime);
-
-    if (!newDate || !newStartTime || !newEndTime) return;
-
+  const handleUpdateConfirm = async () => {
     try {
       const doctorRef = doc(db, "Doctors", doctorId);
-      const appointmentDoc = doc(doctorRef, "appointments", appointmentId);
-      await updateDoc(appointmentDoc, {
-        date: newDate,
-        startTime: newStartTime,
-        endTime: newEndTime,
-      });
-
+      const appointmentDoc = doc(doctorRef, "appointments", editId);
+      await updateDoc(appointmentDoc, editData);
       setAppointments(
-        appointments.map((app) =>
-          app.id === appointmentId ? { ...app, date: newDate, startTime: newStartTime, endTime: newEndTime } : app
+        appointments.map((appointment) =>
+          appointment.id === editId ? { ...appointment, ...editData } : appointment
         )
       );
-      alert("تم تعديل الموعد بنجاح!");
+      setEditId(null);
     } catch (error) {
       console.error("خطأ في تعديل الموعد:", error);
     }
   };
 
-  if (loading) return <div className="flex justify-center mt-10">جاري تحميل المواعيد...</div>;
+  const handleDelete = async (appointmentId) => {
+    try {
+      const doctorRef = doc(db, "Doctors", doctorId);
+      const appointmentDoc = doc(doctorRef, "appointments", appointmentId);
+      await deleteDoc(appointmentDoc);
+      setAppointments(appointments.filter((a) => a.id !== appointmentId));
+      setConfirmDeleteId(null);
+    } catch (error) {
+      console.error("خطأ في حذف الموعد:", error);
+    }
+  };
 
   return (
     <div className="flex justify-center mt-10">
-      <div className="bg-white p-6 rounded-2xl shadow-xl w-full max-w-2xl mx-4">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">مواعيدي</h2>
+      <div className="bg-white p-8 rounded-2xl shadow-xl w-[500px] max-w-lg text-center">
+        <h2 className="text-3xl font-bold text-gray-800 mb-6">مواعيدي</h2>
 
-        {appointments.length === 0 ? (
-          <div className="text-center py-10">
-            <p className="text-gray-500 text-lg">لا توجد مواعيد مسجلة</p>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {appointments.map((appointment) => (
-              <div key={appointment.id} className="p-4 bg-gray-50 rounded-lg shadow flex justify-between items-center">
-                <div>
-                  <p className="font-medium text-gray-800">
-                    التاريخ: {appointment.date}
-                  </p>
-                  <p className="text-gray-600">
-                    الوقت: {appointment.startTime} - {appointment.endTime}
-                  </p>
-                  <p className={`text-sm ${appointment.isBooked ? 'text-green-600' : 'text-gray-500'}`}>
-                    {appointment.isBooked ? 'محجوز' : 'متاح'}
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    className="bg-[#0a5372] hover:bg-[#0d2e4d] text-white px-4 py-2 rounded-lg transition"
-                    onClick={() => handleEdit(appointment.id)}
-                  >
-                    تعديل
-                  </button>
-                  <button
-                    className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition"
-                    onClick={() => handleDelete(appointment.id)}
-                  >
-                    حذف
-                  </button>
-                </div>
+        <ul className="divide-y divide-gray-200">
+          {loading ? (
+            <li className="text-gray-500 p-3 animate-pulse">جاري تحميل المواعيد...</li>
+          ) : appointments.length > 0 ? (
+            appointments.map((appointment) => (
+              <li
+                key={appointment.id}
+                 className="p-4 bg-gray-50 rounded-lg shadow-md mb-4 text-center"
+              >
+                {editId === appointment.id ? (
+                  <>
+                    <input
+                      type="date"
+                      className="border rounded p-1 w-full mb-2"
+                      value={editData.date}
+                      onChange={(e) => setEditData({ ...editData, date: e.target.value })}
+                    />
+                    <input
+                      type="time"
+                      className="border rounded p-1 w-full mb-2"
+                      value={editData.startTime}
+                      onChange={(e) => setEditData({ ...editData, startTime: e.target.value })}
+                    />
+                    <input
+                      type="time"
+                      className="border rounded p-1 w-full mb-2"
+                      value={editData.endTime}
+                      onChange={(e) => setEditData({ ...editData, endTime: e.target.value })}
+                    />
+                    <button
+                      className="bg-[#4acbbf]  text-white px-4 py-2 rounded mt-2"
+                      onClick={handleUpdateConfirm}
+                    >
+                      تأكيد التعديل
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-gray-700 font-medium text-lg ">
+                      D: {appointment.date} T: {appointment.startTime} - {appointment.endTime}
+                    </span>
+                    <div className="flex justify-center space-x-3 pt-3">
+                      <button
+                        className="bg-red-600 hover:bg-red-800 text-white text-sm px-4 py-2 rounded-lg m-3 text-center"
+                        onClick={() => setConfirmDeleteId(appointment.id)}
+                      >
+                        حذف
+                      </button>
+                      <button
+                        className="bg-[#0a5372] hover:bg-[#0d2e4d] text-white text-sm px-4 py-2 rounded-lg m-3"
+                        onClick={() => {
+                          setEditId(appointment.id);
+                          setEditData({
+                            date: appointment.date,
+                            startTime: appointment.startTime,
+                            endTime: appointment.endTime,
+                          });
+                        }}
+                      >
+                        تعديل
+                      </button>
+                    </div>
+                  </>
+                )}
+              </li>
+            ))
+          ) : (
+            <li className="text-gray-500 p-3">لا توجد مواعيد</li>
+          )}
+        </ul>
+
+        {/* Modal الحذف */}
+        {confirmDeleteId && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+            <div className="bg-white p-6 rounded-xl shadow-lg w-80 text-center">
+              <p className="text-lg mb-4">هل تريد حذف هذا الموعد؟</p>
+              <div className="flex justify-center gap-4">
+                <button
+                  className="bg-gray-300 px-4 py-2 rounded"
+                  onClick={() => setConfirmDeleteId(null)}
+                >
+                  إلغاء
+                </button>
+                <button
+                  className="bg-red-600 text-white px-4 py-2 rounded"
+                  onClick={() => handleDelete(confirmDeleteId)}
+                >
+                  نعم
+                </button>
               </div>
-            ))}
+            </div>
           </div>
         )}
       </div>
     </div>
   );
-};
+}
 
 // مكون صفحة الحجوزات
+
 const BookingsPage = () => {
   const user = useAuthStore((state) => state.user);
-  const doctorId = user.uid;
+  const doctorId = user?.uid;
   const [bookings, setBookings] = useState({ upcoming: [], past: [] });
+  const [existingDiagnoses, setExistingDiagnoses] = useState({});
+  const [openDiagnosisInputs, setOpenDiagnosisInputs] = useState({});
+  const [diagnosisInputs, setDiagnosisInputs] = useState({});
   const [loading, setLoading] = useState(true);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [pendingDiagnosis, setPendingDiagnosis] = useState(null);
 
   useEffect(() => {
     const fetchBookings = async () => {
       if (!doctorId) return;
-      setLoading(true);
+
       const doctorRef = doc(db, "Doctors", doctorId);
       const bookingsRef = collection(doctorRef, "PatientBookings");
       const snapshot = await getDocs(bookingsRef);
-      const allBookings = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      const allBookings = snapshot.docs.map((doc) => doc.data());
 
       const currentDate = new Date().toISOString().split("T")[0];
       const upcoming = allBookings.filter((booking) => booking.date >= currentDate);
       const past = allBookings.filter((booking) => booking.date < currentDate);
 
       setBookings({ upcoming, past });
+
+      const diagnosisPromises = allBookings.map(async (booking) => {
+        const patientDocRef = doc(db, "users", booking.UserId);
+        const patientSnap = await getDoc(patientDocRef);
+        if (patientSnap.exists()) {
+          const patientData = patientSnap.data();
+          const key = `${booking.UserId}_${booking.date}`;
+          return { key, value: patientData?.diagnosisByDate?.[booking.date] || null };
+        }
+        return null;
+      });
+
+      const diagnosisResults = await Promise.all(diagnosisPromises);
+      const diagnosisMap = {};
+      diagnosisResults.forEach((item) => {
+        if (item) diagnosisMap[item.key] = item.value;
+      });
+      setExistingDiagnoses(diagnosisMap);
       setLoading(false);
     };
+
     fetchBookings();
   }, [doctorId]);
 
-  if (loading) return <div className="flex justify-center mt-10">جاري تحميل الحجوزات...</div>;
+  const handleDiagnosisSave = async (patientId, date) => {
+    const key = `${patientId}_${date}`;
+    try {
+      const diagnosisRef = doc(db, "users", patientId);
+      await setDoc(
+        diagnosisRef,
+        {
+          diagnosisByDate: {
+            [date]: diagnosisInputs[key],
+          },
+        },
+        { merge: true }
+      );
+
+      setExistingDiagnoses((prev) => ({
+        ...prev,
+        [key]: diagnosisInputs[key],
+      }));
+
+      setOpenDiagnosisInputs((prev) => ({
+        ...prev,
+        [key]: false,
+      }));
+    } catch (error) {
+      console.error("فشل حفظ التشخيص:", error);
+      alert("حدث خطأ أثناء حفظ التشخيص");
+      setOpenDiagnosisInputs((prev) => ({
+        ...prev,
+        [key]: false,
+      }));
+    }
+  };
+
+  const renderBookingItem = (booking, index, isPast = false) => {
+    const patientId = booking.UserId;
+    const bookingDate = booking.date;
+    const uniqueKey = `${patientId}_${bookingDate}`;
+
+    return (
+      <li key={index} className="p-4 bg-gray-50 rounded-xl shadow-md mb-4 text-right space-y-3">
+        <div className="grid grid-cols-1 gap-1 sm:grid-cols-2 sm:gap-4 text-gray-700 font-medium text-sm sm:text-base">
+          <div><span className="font-semibold">التاريخ:</span> {booking.date}</div>
+          <div><span className="font-semibold">الوقت:</span> {booking.time}</div>
+          <div className="sm:col-span-2"><span className="font-semibold">المريض:</span> {booking.patientName}</div>
+        </div>
+
+        {openDiagnosisInputs[uniqueKey] ? (
+          <div className="space-y-2 mt-2">
+            <input
+              type="text"
+              placeholder="أدخل التشخيص"
+              className="border border-gray-300 p-2 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+              value={diagnosisInputs[uniqueKey] || ""}
+              onChange={(e) =>
+                setDiagnosisInputs({
+                  ...diagnosisInputs,
+                  [uniqueKey]: e.target.value,
+                })
+              }
+            />
+            <button
+              className="w-full bg-[#4acbbf] text-white py-2 rounded-lg transition"
+              onClick={() => {
+                setPendingDiagnosis({ patientId, date: bookingDate });
+                setShowConfirmModal(true);
+              }}
+            >
+              حفظ التشخيص
+            </button>
+          </div>
+        ) : (
+          <button
+            className="w-full bg-[#0a5372] hover:bg-[#0d2e4d] text-white py-2 rounded-lg transition"
+            onClick={() => {
+              setOpenDiagnosisInputs((prev) => ({
+                ...prev,
+                [uniqueKey]: true,
+              }));
+
+              if (existingDiagnoses[uniqueKey]) {
+                setDiagnosisInputs((prev) => ({
+                  ...prev,
+                  [uniqueKey]: existingDiagnoses[uniqueKey],
+                }));
+              }
+            }}
+          >
+            {existingDiagnoses[uniqueKey] ? "تعديل التشخيص" : "إضافة تشخيص"}
+          </button>
+        )}
+      </li>
+    );
+  };
 
   return (
     <div className="flex justify-center mt-10">
-      <div className="bg-white p-6 rounded-2xl shadow-xl w-full max-w-4xl mx-4">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">حجوزاتي</h2>
+      <div className="bg-white p-6 rounded-2xl shadow-xl w-[500px] max-w-md text-center">
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">حجوزاتي</h2>
 
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h3 className="text-lg font-semibold text-gray-700 mb-4 text-center">الحجوزات القادمة</h3>
-            {bookings.upcoming.length > 0 ? (
-              <ul className="space-y-3">
-                {bookings.upcoming.map((booking) => (
-                  <li key={booking.id} className="p-3 bg-white rounded-lg shadow">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <p className="font-medium text-gray-800">{booking.patientName}</p>
-                        <p className="text-sm text-gray-600">
-                          {booking.date} - {booking.time}
-                        </p>
-                      </div>
-                      <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
-                        قادمة
-                      </span>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-gray-500 text-center py-4">لا توجد حجوزات قادمة</p>
-            )}
-          </div>
+        <h4 className="text-lg font-semibold text-gray-700 mt-4">الحجوزات القادمة</h4>
+        <ul className="divide-y divide-gray-200 mb-4">
+          {loading ? (
+            <li className="text-gray-500 p-3">جاري تحميل الحجوزات...</li>
+          ) : bookings.upcoming.length > 0 ? (
+            bookings.upcoming.map((booking, i) => renderBookingItem(booking, i))
+          ) : (
+            <li className="text-gray-500 p-3">لا توجد حجوزات قادمة</li>
+          )}
+        </ul>
 
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h3 className="text-lg font-semibold text-gray-700 mb-4 text-center">الحجوزات المنتهية</h3>
-            {bookings.past.length > 0 ? (
-              <ul className="space-y-3">
-                {bookings.past.map((booking) => (
-                  <li key={booking.id} className="p-3 bg-white rounded-lg shadow">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <p className="font-medium text-gray-800">{booking.patientName}</p>
-                        <p className="text-sm text-gray-600">
-                          {booking.date} - {booking.time}
-                        </p>
-                      </div>
-                      <span className="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">
-                        منتهية
-                      </span>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-gray-500 text-center py-4">لا توجد حجوزات منتهية</p>
-            )}
+        <h4 className="text-lg font-semibold text-gray-700 mt-4">الحجوزات المنتهية</h4>
+        <ul className="divide-y divide-gray-200 mb-4">
+          {loading ? (
+            <li className="text-gray-500 p-3">جاري تحميل الحجوزات...</li>
+          ) : bookings.past.length > 0 ? (
+            bookings.past.map((booking, i) => renderBookingItem(booking, i, true))
+          ) : (
+            <li className="text-gray-500 p-3">لا توجد حجوزات منتهية</li>
+          )}
+        </ul>
+      </div>
+
+      {showConfirmModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded-xl shadow-lg w-[90%] max-w-md text-center">
+            <h2 className="text-xl font-semibold mb-4 text-gray-800">تأكيد الحفظ</h2>
+            <p className="text-gray-600 mb-6">هل تريد حفظ التشخيص؟</p>
+            <div className="flex justify-center gap-4">
+              <button
+                className="px-6 py-2 bg-[#4acbbf] text-white rounded-lg hover:bg-[#3bb1a8]"
+                onClick={async () => {
+                  const { patientId, date } = pendingDiagnosis;
+                  await handleDiagnosisSave(patientId, date);
+                  setShowConfirmModal(false);
+                  setPendingDiagnosis(null);
+                }}
+              >
+                تأكيد
+              </button>
+              <button
+                className="px-6 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400"
+                onClick={() => setShowConfirmModal(false)}
+              >
+                إلغاء
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
-
 
 
 

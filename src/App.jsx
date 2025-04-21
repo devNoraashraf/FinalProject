@@ -25,6 +25,7 @@ import DoctorsListPage from './Pages/DoctorsListPage';
 import DoaaDahboard from "./Pages/DoaaDahboard";
 // import AProfile from "./Pages/profile";
 import DoctorsList from './Pages/DoctorsList';
+import AskDoctorButton from "./Pages/AskDoctorButton"; // زر اسأل حكيم
 
 const cookies = new Cookies();
 
@@ -68,6 +69,7 @@ function App() {
 
         <Route path="/change-password" element={<ChangePassword />} />
       </Routes>
+      {!hideHeaderFooter && <AskDoctorButton />} {/* 👈 زر اسأل حكيم */}
       {!hideHeaderFooter && <Footer />}
     </>
   );
